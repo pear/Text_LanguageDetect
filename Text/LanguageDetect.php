@@ -13,7 +13,6 @@
  * @author     Nicholas Pisarro <infinityminusnine+pear@gmail.com>
  * @copyright  2005 Nicholas Pisarro
  * @license    http://www.debian.org/misc/bsd.license BSD
- * @link       http://junker.org/~nickp/langdetect
  * @version    CVS: $Id$
  */
 
@@ -30,7 +29,6 @@ require_once 'PEAR.php';
  * @author     Nicholas Pisarro <infinityminusnine+pear@gmail.com>
  * @copyright  2005 Nicholas Pisarro
  * @license    http://www.debian.org/misc/bsd.license BSD
- * @link       http://junker.org/~nickp/langdetect
  * @version    Release: @package_version@
  * @todo       allow users to generate their own language models
  */
@@ -511,6 +509,8 @@ class Text_LanguageDetect
      *
      * Sums the differences in rank for each trigram. If the trigram does not 
      * appear in both, consider it a difference of $this->_threshold.
+     *
+     * Based on the statistical method used by perl's Language::Guess.
      *
      * @access  private
      * @param   array    $arr1  the reference set of trigram ranks
