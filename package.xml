@@ -4,79 +4,43 @@
 	<name>Text_LanguageDetect</name>
 	<summary>Language detection class</summary>
 	<description>Text_LanguageDetect can identify 52 human languages from text samples and return confidence scores for each.</description>
-  <maintainers>
-    <maintainer>
-      <user>taak</user>
-      <name>Nicholas Pisarro</name>
-      <email>infinityminusnine+pear@gmail.com</email>
-      <role>lead</role>
-    </maintainer>
-  </maintainers>
-  <release>
-	<version>0.9.5</version>
-	<date>2005-12-19</date>
-	<license>BSD</license>
-	<state>beta</state>
-	<notes>Fixed encoding in web example</notes>
 
-    <filelist>
-      <file role="php" name="Text/LanguageDetect.php" >
-		  <replace from="@package_version@" to="version" type="package-info" />
-		  <replace from="@data_dir@" to="data_dir" type="pear-config" />
-	  </file>
-      <file role="data" name="data/lang.dat" install-as="lang.dat" />
-      <file role="test" name="tests/unittest.php"/>
-      <file role="doc" name="docs/example_clui.php"/>
-      <file role="doc" name="docs/example_web.php"/>
-    </filelist>
+	<maintainers>
+		<maintainer>
+			<user>taak</user>
+			<name>Nicholas Pisarro</name>
+			<email>infinityminusnine+pear@gmail.com</email>
+			<role>lead</role>
+		</maintainer>
+	</maintainers>
 
-  </release>
-  <changelog>
 	<release>
-		<version>0.9.5</version>
-		<date>2005-12-18</date>
+		<version>0.1.0</version>
+		<date>2006-01-04</date>
 		<license>BSD</license>
-		<state>beta</state>
-		<notes>Fixed encoding in web example</notes>
-	</release>
-	<release>
-		<version>0.9.4</version>
-		<date>2005-12-14</date>
-		<license>BSD</license>
-		<state>beta</state>
-		<notes>Style changes</notes>
-	</release>
-	<release>
-		<version>0.9.3</version>
-		<date>2005-12-10</date>
-		<license>BSD</license>
-		<state>beta</state>
-		<notes>Reorganized files and directories. Package now uses PEAR data dir correctly.</notes>
-	</release>
-	<release>
-		<version>0.9.2</version>
-		<date>2005-12-06</date>
-		<license>BSD</license>
-		<state>beta</state>
-		<notes>Changed licensing information. Various minor style changes.</notes>
-	</release>
-	<release>
-		<version>0.9.1</version>
-		<date>2005-12-05</date>
-		<license>BSD</license>
-		<state>beta</state>
-		<notes>Improved error reporting. Needless die()'s in private functions were eliminated, and now returns a PEAR_Error object if there is an error in the object's setup.</notes>
-	</release>
-    <release>
-      <version>0.9.0</version>
-      <date>2005-11-30</date>
-	  <license>BSD</license>
-      <state>beta</state>
-	  <notes>Initial release for proposal.
+		<state>alpha</state>
+		<notes>Initial PEAR release</notes>
 
-		The goal for this release was to be able to emulate Perl's Language::Guess module exactly. When not in full-compatibility mode it provides some moderate enhancements and a normalized scoring method, as well as an additional "relative" confidence score.
-	
-		Limitations of this release include the absence of language models for the Korean and Japanese languages. In addition no tools are provided for users to generate and use alternative language model databases.</notes>
-    </release>
-  </changelog>
+		<filelist>
+			<file role="php" name="Text/LanguageDetect.php" >
+				<replace from="@package_version@" to="version" type="package-info" />
+				<replace from="@data_dir@" to="data_dir" type="pear-config" />
+			</file>
+			<file role="data" name="data/lang.dat" install-as="lang.dat" />
+			<file role="test" name="tests/unittest.php"/>
+			<file role="doc" name="docs/example_clui.php"/>
+			<file role="doc" name="docs/example_web.php"/>
+		</filelist>
+
+	</release>
+
+	<changelog>
+		<release>
+			<version>0.1.0</version>
+			<date>2006-01-06</date>
+			<license>BSD</license>
+			<state>alpha</state>
+			<notes>Initial PEAR release</notes>
+		</release>
+	</changelog>
 </package>
