@@ -602,7 +602,7 @@ class Text_LanguageDetect
 
             $encoding = mb_detect_encoding($sample);
             if ($encoding != 'ASCII' && $encoding != 'UTF-8') {
-                $sample = mb_convert_encoding($sample,'UTF-8');
+                $sample = mb_convert_encoding($sample, 'UTF-8');
             }
         }
 
