@@ -137,14 +137,18 @@ class Text_LanguageDetect
      */
     function _readdb($fname)
     {
-        if (!file_exists($fname) || !is_readable($fname)) {
-            return PEAR::raiseError("Language database does not exist or is not readable.");
+        // input check
+        if (!file_exists($fname)) {
+            return PEAR::raiseError("Language database does not exist.");
+        } elseif (!is_readable($fname)) {
+            return PEAR::raiseError("Language database is not readable.");
         }
 
         if (function_exists('file_get_contents')) {
             return unserialize(file_get_contents($fname));
         } else {
-            // if you don't have file_get_contents(), then this is the next fastest way
+            // if you don't have file_get_contents(), 
+            // then this is the next fastest way
             ob_start();
             readfile($fname);
             $contents = ob_get_contents();
@@ -593,7 +597,9 @@ class Text_LanguageDetect
         }
 
         // check char encoding (only if mbstring extension is compiled)
-        if (function_exists('mb_detect_encoding') && function_exists('mb_convert_encoding')) {
+        if (function_exists('mb_detect_encoding') 
+            && function_exists('mb_convert_encoding')) {
+
             $encoding = mb_detect_encoding($sample);
             if ($encoding != 'ASCII' && $encoding != 'UTF-8') {
                 $sample = mb_convert_encoding($sample,'UTF-8');
@@ -610,7 +616,11 @@ class Text_LanguageDetect
         // normalize the score
         // by dividing it by the number of trigrams present
         foreach ($this->_lang_db as $lang => $lang_arr) {
-            $scores[$lang] = $this->_normalize_score($this->_distance($lang_arr, $trigram_freqs), $trigram_count);
+            $scores[$lang] =
+                $this->_normalize_score(
+                    $this->_distance($lang_arr, $trigram_freqs),
+                    $trigram_count);
+
         }
 
         if ($this->_perl_compatible) {
@@ -663,8 +673,12 @@ class Text_LanguageDetect
 
         // if top language has the maximum possible score,
         // then the top score will have been picked at random
-        if (!is_array($scores) || !count($scores) || current($scores) == $this->_max_score) {
+        if (    !is_array($scores) 
+                || !count($scores) 
+                || current($scores) == $this->_max_score) {
+
             return null;
+
         } else {
             return ucfirst(key($scores));
         }
@@ -705,7 +719,10 @@ class Text_LanguageDetect
 
         // if most similar language has the max score, it 
         // will have been picked at random
-        if (!is_array($scores) || !count($scores) || current($scores) == $this->_max_score) {
+        if (    !is_array($scores) 
+                || !count($scores) 
+                || current($scores) == $this->_max_score) {
+
             return null;
         }
 
@@ -716,9 +733,14 @@ class Text_LanguageDetect
             // the similarity of the first score and the second score is high
 
             if ($this->_perl_compatible) {
-                $arr['confidence'] = (current($scores) - $arr['similarity']) / $this->_max_score;
+
+                $arr['confidence'] =
+                    (current($scores) - $arr['similarity']) / $this->_max_score;
+
             } else {
+
                 $arr['confidence'] = $arr['similarity'] - current($scores);
+
             }
 
         } else {
@@ -774,7 +796,12 @@ class Text_LanguageDetect
                 $lang2 = strtolower($lang2);
 
                 // compare just these two languages
-                return $this->_normalize_score($this->_distance($this->_lang_db[$lang1], $this->_lang_db[$lang2]));
+                return $this->_normalize_score(
+                    $this->_distance(
+                        $this->_lang_db[$lang1],
+                        $this->_lang_db[$lang2]
+                    )
+                );
 
 
             // compare just $lang1 to all languages
@@ -782,7 +809,8 @@ class Text_LanguageDetect
                 $return_arr = array();
                 foreach ($this->_lang_db as $key => $value) {
                     if ($key != $lang1) { // don't compare a language to itself
-                        $return_arr[$key] = $this->_normalize_score($this->_distance($this->_lang_db[$lang1], $value));
+                        $return_arr[$key] = $this->_normalize_score(
+                            $this->_distance($this->_lang_db[$lang1], $value));
                     }
                 }
                 asort($return_arr);
@@ -796,11 +824,27 @@ class Text_LanguageDetect
             $return_arr = array();
             foreach (array_keys($this->_lang_db) as $lang1) {
                 foreach (array_keys($this->_lang_db) as $lang2) {
-                    if ($lang1 != $lang2) { // skip comparing languages to themselves
+
+                    // skip comparing languages to themselves
+                    if ($lang1 != $lang2) { 
+                    
+                        // don't re-calculate what's already been done
                         if (isset($return_arr[$lang2][$lang1])) {
-                            $return_arr[$lang1][$lang2] = $return_arr[$lang2][$lang1];
+
+                            $return_arr[$lang1][$lang2] =
+                                $return_arr[$lang2][$lang1];
+
+                        // calculate
                         } else {
-                            $return_arr[$lang1][$lang2] = $this->_normalize_score($this->_distance($this->_lang_db[$lang1], $this->_lang_db[$lang2]));
+
+                            $return_arr[$lang1][$lang2] = 
+                                $this->_normalize_score(
+                                        $this->_distance(
+                                            $this->_lang_db[$lang1],
+                                            $this->_lang_db[$lang2]
+                                        )
+                                );
+
                         }
                     }
                 }
@@ -848,7 +892,7 @@ class Text_LanguageDetect
 
         // multi-byte chars
         } elseif ($ord >> 5 == 6) { // two-byte char
-            $nextchar = $str{$counter++}; // tag on next byte
+            $nextchar = $str{$counter++}; // get next byte
 
             // lower case latin accented characters
             if ($special_convert && $ord == 195) {
@@ -856,13 +900,19 @@ class Text_LanguageDetect
                 $nextord_adj = $nextord + 64;
                 // for a reference, see 
                 // http://www.ramsch.org/martin/uni/fmi-hp/iso8859-1.html
-                if ($nextord_adj >= 192 && $nextord_adj <= 222 && 
-                    $nextord_adj != 215) { // &Agrave; - &THORN; but not &times;
-                    $nextchar = chr($nextord + 32); // lower case
+
+                // &Agrave; - &THORN; but not &times;
+                if (    $nextord_adj >= 192
+                        && $nextord_adj <= 222 
+                        && $nextord_adj != 215) {
+
+                    // lower case
+                    $nextchar = chr($nextord + 32); 
                 }
             }
 
-            $char .= $nextchar;
+            // tag on next byte
+            $char .= $nextchar; 
 
         } elseif ($ord >> 4  == 14) { // three-byte char
             
