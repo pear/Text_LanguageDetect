@@ -5,7 +5,7 @@
  * @version CVS: $Id$
  */
 
-require_once '../Text/LanguageDetect.php';
+require_once 'Text/LanguageDetect.php';
 require_once 'PHPUnit.php';
 
 class langtest extends PHPUnit_TestCase {
