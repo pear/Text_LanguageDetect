@@ -13,11 +13,11 @@
     </maintainer>
   </maintainers>
   <release>
-	<version>0.9.3</version>
-	<date>2005-12-10</date>
+	<version>0.9.5</version>
+	<date>2005-12-19</date>
 	<license>BSD</license>
 	<state>beta</state>
-	<notes>Reorganized files and directories. Package now uses PEAR data dir correctly.</notes>
+	<notes>Fixed encoding in web example</notes>
 
     <filelist>
       <file role="php" name="Text/LanguageDetect.php" >
@@ -32,6 +32,20 @@
 
   </release>
   <changelog>
+	<release>
+		<version>0.9.5</version>
+		<date>2005-12-18</date>
+		<license>BSD</license>
+		<state>beta</state>
+		<notes>Fixed encoding in web example</notes>
+	</release>
+	<release>
+		<version>0.9.4</version>
+		<date>2005-12-14</date>
+		<license>BSD</license>
+		<state>beta</state>
+		<notes>Style changes</notes>
+	</release>
 	<release>
 		<version>0.9.3</version>
 		<date>2005-12-10</date>
