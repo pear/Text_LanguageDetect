@@ -877,269 +877,271 @@ class Text_LanguageDetect
         }
     }
 
-	/**
-	 * Cluster known languages according to languageSimilarity()
-	 *
-	 * WARNING: this method is EXPERIMENTAL. It is not recommended for common
-	 * use, and it may disappear or its functionality may change in future
-	 * releases without notice.
-	 *
-	 * Uses a nearest neighbor technique to generate the maximum possible
-	 * number of dendograms from the similarity data.
-	 *
-	 * @access public
-	 * @return array language cluster data
-	 * @throws PEAR_Error
-	 * @see languageSimilarity()
-	 */
-	function clusterLanguages () {
-		// todo: set the maximum number of clusters
+    /**
+     * Cluster known languages according to languageSimilarity()
+     *
+     * WARNING: this method is EXPERIMENTAL. It is not recommended for common
+     * use, and it may disappear or its functionality may change in future
+     * releases without notice.
+     *
+     * Uses a nearest neighbor technique to generate the maximum possible
+     * number of dendograms from the similarity data.
+     *
+     * @access public
+     * @return array language cluster data
+     * @throws PEAR_Error
+     * @see languageSimilarity()
+     */
+    function clusterLanguages ()
+    {
+    	// todo: set the maximum number of clusters
 
-		$langs = array_keys($this->_lang_db);
+    	$langs = array_keys($this->_lang_db);
 
-		$arr = $this->languageSimilarity();
+    	$arr = $this->languageSimilarity();
 
-		sort($langs);
+    	sort($langs);
 
-		foreach ($langs as $lang) {
-			if (!isset($this->_lang_db[$lang])) {
-				return PEAR::raiseError("missing $lang!\n");
-			}
-		}
+    	foreach ($langs as $lang) {
+    		if (!isset($this->_lang_db[$lang])) {
+    			return PEAR::raiseError("missing $lang!\n");
+    		}
+    	}
 
-		// http://www.psychstat.missouristate.edu/multibook/mlt04m.html
-		foreach ($langs as $old_key => $lang1) {
-			$langs[$lang1] = $lang1;
-			unset($langs[$old_key]);
-		}
-		
-		$i = 0;
-		while (count($langs) > 2 && $i++ < 200) {
-			$highest_score = -1;
-			$highest_key1 = '';
-			$highest_key2 = '';
-			foreach ($langs as $lang1) {
-				foreach ($langs as $lang2) {
-					if (	$lang1 != $lang2 
-							&& $arr[$lang1][$lang2] > $highest_score) {
-						$highest_score = $arr[$lang1][$lang2];
-						$highest_key1 = $lang1;
-						$highest_key2 = $lang2;
-					}
-				}
-			}
-			
-			if (!$highest_key1) {
-				return PEAR::raiseError("$i. no highest key?\n");
-			}
+    	// http://www.psychstat.missouristate.edu/multibook/mlt04m.html
+    	foreach ($langs as $old_key => $lang1) {
+    		$langs[$lang1] = $lang1;
+    		unset($langs[$old_key]);
+    	}
+    	
+    	$i = 0;
+    	while (count($langs) > 2 && $i++ < 200) {
+    		$highest_score = -1;
+    		$highest_key1 = '';
+    		$highest_key2 = '';
+    		foreach ($langs as $lang1) {
+    			foreach ($langs as $lang2) {
+    				if (	$lang1 != $lang2 
+    						&& $arr[$lang1][$lang2] > $highest_score) {
+    					$highest_score = $arr[$lang1][$lang2];
+    					$highest_key1 = $lang1;
+    					$highest_key2 = $lang2;
+    				}
+    			}
+    		}
+    		
+    		if (!$highest_key1) {
+    			return PEAR::raiseError("$i. no highest key?\n");
+    		}
 
-			if ($highest_score == 0) {
-				// languages are perfectly dissimilar
-				break;
-			}
+    		if ($highest_score == 0) {
+    			// languages are perfectly dissimilar
+    			break;
+    		}
 
-			// $highest_key1 and $highest_key2 are most similar
-			$sum1 = array_sum($arr[$highest_key1]);
-			$sum2 = array_sum($arr[$highest_key2]);
+    		// $highest_key1 and $highest_key2 are most similar
+    		$sum1 = array_sum($arr[$highest_key1]);
+    		$sum2 = array_sum($arr[$highest_key2]);
 
-			// use the score for the one that is most similar to the rest of 
-			// the field as the score for the group
-			// todo: could try averaging or "centroid" method instead
-			// seems like that might make more sense
-			// actually nearest neighbor may be better for binary searching
-
-
-			// for "Complete Linkage"/"furthest neighbor"
-			// sign should be <
-			// for "Single Linkage"/"nearest neighbor" method
-			// should should be >
-			// results seem to be pretty much the same with either method
-
-			// figure out which to delete and which to replace
-			if ($sum1 > $sum2) {
-				$replaceme = $highest_key1;
-				$deleteme = $highest_key2;
-			} else {
-				$replaceme = $highest_key2;
-				$deleteme = $highest_key1;
-			}
-
-			$newkey = $replaceme . ':' . $deleteme;
-
-			// $replaceme is most similar to remaining languages
-			// replace $replaceme with '$newkey', deleting $deleteme
-
-			// keep a record of which fork is really which language
-			$really_lang = $replaceme;
-			while (isset($really_map[$really_lang])) {
-				$really_lang = $really_map[$really_lang];
-			} 
-			$really_map[$newkey] = $really_lang;
+    		// use the score for the one that is most similar to the rest of 
+    		// the field as the score for the group
+    		// todo: could try averaging or "centroid" method instead
+    		// seems like that might make more sense
+    		// actually nearest neighbor may be better for binary searching
 
 
-			// replace the best fitting key, delete the other
-			foreach ($arr as $key1 => $arr2) {
-				foreach ($arr2 as $key2 => $value2) {
-					if ($key2 == $replaceme) {
-						$arr[$key1][$newkey] = $arr[$key1][$key2];
-						unset($arr[$key1][$key2]);
-						// replacing $arr[$key1][$key2] with $arr[$key1][$newkey]
-					} 
-					
-					if ($key1 == $replaceme) {
-						$arr[$newkey][$key2] = $arr[$key1][$key2];
-						unset($arr[$key1][$key2]);
-						// replacing $arr[$key1][$key2] with $arr[$newkey][$key2]
-					}
+    		// for "Complete Linkage"/"furthest neighbor"
+    		// sign should be <
+    		// for "Single Linkage"/"nearest neighbor" method
+    		// should should be >
+    		// results seem to be pretty much the same with either method
 
-					if ($key1 == $deleteme || $key2 == $deleteme) {
-						// deleting $arr[$key1][$key2]
-						unset($arr[$key1][$key2]);
-					}
-				}
-			}
-						
+    		// figure out which to delete and which to replace
+    		if ($sum1 > $sum2) {
+    			$replaceme = $highest_key1;
+    			$deleteme = $highest_key2;
+    		} else {
+    			$replaceme = $highest_key2;
+    			$deleteme = $highest_key1;
+    		}
 
-			unset($langs[$highest_key1]);
-			unset($langs[$highest_key2]);
-			$langs[$newkey] = $newkey;
+    		$newkey = $replaceme . ':' . $deleteme;
 
+    		// $replaceme is most similar to remaining languages
+    		// replace $replaceme with '$newkey', deleting $deleteme
 
-			// some of these may be overkill
-			$result_data[$newkey] = array(
-								'newkey' => $newkey,
-								'count' => $i,
-								'diff' => abs($sum1 - $sum2),
-								'score' => $highest_score,
-								'bestfit' => $replaceme,
-								'otherfit' => $deleteme,
-								'really' => $really_lang,
-							);
-		}
-
-		$return_val = array(
-				'open_forks' => $langs, 
-                    // the top level of clusters
-                    // clusters that are mutually exclusive
-                    // or specified by a specific maximum
-
-				'fork_data' => $result_data,
-                    // data for each split
-
-				'name_map' => $really_map,
-                    // which cluster is really which language
-                    // using the nearest neighbor technique, the cluster
-                    // inherits all of the properties of its most-similar member
-                    // this keeps track
-			);
-
-		return $return_val;
-	}
+    		// keep a record of which fork is really which language
+    		$really_lang = $replaceme;
+    		while (isset($really_map[$really_lang])) {
+    			$really_lang = $really_map[$really_lang];
+    		} 
+    		$really_map[$newkey] = $really_lang;
 
 
-	/**
-	 * Perform an intelligent detection based on clusterLanguages()
-	 *
-	 * WARNING: this method is EXPERIMENTAL. It is not recommended for common
-	 * use, and it may disappear or its functionality may change in future
-	 * releases without notice.
-	 *
-	 * This compares the sample text to top the top level of clusters. If the 
-	 * sample is similar to the cluster it will drop down and compare it to the
-	 * languages in the cluster, and so on until it hits a leaf node.
-	 *
-	 * this should find the language in considerably fewer compares 
-	 * (the equivalent of a binary search), however clusterLanguages() is costly
+    		// replace the best fitting key, delete the other
+    		foreach ($arr as $key1 => $arr2) {
+    			foreach ($arr2 as $key2 => $value2) {
+    				if ($key2 == $replaceme) {
+    					$arr[$key1][$newkey] = $arr[$key1][$key2];
+    					unset($arr[$key1][$key2]);
+    					// replacing $arr[$key1][$key2] with $arr[$key1][$newkey]
+    				} 
+    				
+    				if ($key1 == $replaceme) {
+    					$arr[$newkey][$key2] = $arr[$key1][$key2];
+    					unset($arr[$key1][$key2]);
+    					// replacing $arr[$key1][$key2] with $arr[$newkey][$key2]
+    				}
+
+    				if ($key1 == $deleteme || $key2 == $deleteme) {
+    					// deleting $arr[$key1][$key2]
+    					unset($arr[$key1][$key2]);
+    				}
+    			}
+    		}
+    					
+
+    		unset($langs[$highest_key1]);
+    		unset($langs[$highest_key2]);
+    		$langs[$newkey] = $newkey;
+
+
+    		// some of these may be overkill
+    		$result_data[$newkey] = array(
+    							'newkey' => $newkey,
+    							'count' => $i,
+    							'diff' => abs($sum1 - $sum2),
+    							'score' => $highest_score,
+    							'bestfit' => $replaceme,
+    							'otherfit' => $deleteme,
+    							'really' => $really_lang,
+    						);
+    	}
+
+    	$return_val = array(
+    			'open_forks' => $langs, 
+                        // the top level of clusters
+                        // clusters that are mutually exclusive
+                        // or specified by a specific maximum
+
+    			'fork_data' => $result_data,
+                        // data for each split
+
+    			'name_map' => $really_map,
+                        // which cluster is really which language
+                        // using the nearest neighbor technique, the cluster
+                        // inherits all of the properties of its most-similar member
+                        // this keeps track
+    		);
+
+    	return $return_val;
+    }
+
+
+    /**
+     * Perform an intelligent detection based on clusterLanguages()
+     *
+     * WARNING: this method is EXPERIMENTAL. It is not recommended for common
+     * use, and it may disappear or its functionality may change in future
+     * releases without notice.
+     *
+     * This compares the sample text to top the top level of clusters. If the 
+     * sample is similar to the cluster it will drop down and compare it to the
+     * languages in the cluster, and so on until it hits a leaf node.
+     *
+     * this should find the language in considerably fewer compares 
+     * (the equivalent of a binary search), however clusterLanguages() is costly
      * and the loss of accuracy from this techniqueis significant.
      *
-	 * This method may need to be 'fuzzier' in order to become more accurate.
+     * This method may need to be 'fuzzier' in order to become more accurate.
      *
      * This function could be more useful if the universe of possible languages
      * was very large, however in such cases some method of Bayesian inference
      * might be more helpful.
-	 *
-	 * @see clusterLanguages()
-	 * @access public
-	 * @param string $str input string
-	 * @return array language scores (only those compared)
-	 */
-	function clusteredSearch ($str) {
+     *
+     * @see clusterLanguages()
+     * @access public
+     * @param string $str input string
+     * @return array language scores (only those compared)
+     */
+    function clusteredSearch ($str)
+    {
 
-		// todo: this should be cached in the object, not calculated each time
+    	// todo: this should be cached in the object, not calculated each time
         // otherwise it defeats the point
-		$result = $this->clusterLanguages();
+    	$result = $this->clusterLanguages();
 
-		$dendogram_start = $result['open_forks'];
-		$dendogram_data = $result['fork_data'];
-		$dendogram_alias = $result['name_map'];
-		
+    	$dendogram_start = $result['open_forks'];
+    	$dendogram_data = $result['fork_data'];
+    	$dendogram_alias = $result['name_map'];
+    	
 
-		$sample_result = $this->_arr_rank($this->_trigram($str));
-		$sample_count = count($sample_result);
+    	$sample_result = $this->_arr_rank($this->_trigram($str));
+    	$sample_count = count($sample_result);
 
-		$i = 0; // counts the number of steps
-		
-		foreach ($dendogram_start as $lang) {
-			if (isset($dendogram_alias[$lang])) {
-				$lang_key = $dendogram_alias[$lang];
-			} else {
-				$lang_key = $lang;
-			}
+    	$i = 0; // counts the number of steps
+    	
+    	foreach ($dendogram_start as $lang) {
+    		if (isset($dendogram_alias[$lang])) {
+    			$lang_key = $dendogram_alias[$lang];
+    		} else {
+    			$lang_key = $lang;
+    		}
 
-			$scores[$lang] = $this->_normalize_score(
-				$this->_distance($this->_lang_db[$lang_key], $sample_result),
-				$sample_count);
+    		$scores[$lang] = $this->_normalize_score(
+    			$this->_distance($this->_lang_db[$lang_key], $sample_result),
+    			$sample_count);
 
-			$i++;
-		}
+    		$i++;
+    	}
 
-		if ($this->_perl_compatible) {
-			asort($scores);
-		} else {
-			arsort($scores);
-		}
+    	if ($this->_perl_compatible) {
+    		asort($scores);
+    	} else {
+    		arsort($scores);
+    	}
 
-		$top_score = current($scores);
-		$top_key = key($scores);
+    	$top_score = current($scores);
+    	$top_key = key($scores);
 
-		// of starting forks, $top_key is the most similar to the sample
+    	// of starting forks, $top_key is the most similar to the sample
 
-		$cur_key = $top_key;
-		while (isset($dendogram_data[$cur_key])) {
-			$lang1 = $dendogram_data[$cur_key]['bestfit'];
-			$lang2 = $dendogram_data[$cur_key]['otherfit'];
-			foreach (array($lang1, $lang2) as $lang) {
-				if (isset($dendogram_alias[$lang])) {
-					$lang_key = $dendogram_alias[$lang];
-				} else {
-					$lang_key = $lang;
-				}
+    	$cur_key = $top_key;
+    	while (isset($dendogram_data[$cur_key])) {
+    		$lang1 = $dendogram_data[$cur_key]['bestfit'];
+    		$lang2 = $dendogram_data[$cur_key]['otherfit'];
+    		foreach (array($lang1, $lang2) as $lang) {
+    			if (isset($dendogram_alias[$lang])) {
+    				$lang_key = $dendogram_alias[$lang];
+    			} else {
+    				$lang_key = $lang;
+    			}
 
-				$scores[$lang] = $this->_normalize_score(
-					$this->_distance($this->_lang_db[$lang_key], $sample_result),
-					$sample_count);
+    			$scores[$lang] = $this->_normalize_score(
+    				$this->_distance($this->_lang_db[$lang_key], $sample_result),
+    				$sample_count);
 
-				//todo: does not need to do same comparison again
-			}
+    			//todo: does not need to do same comparison again
+    		}
 
-			$i++;
+    		$i++;
 
-			if ($scores[$lang1] > $scores[$lang2]) {
-				$cur_key = $lang1;
-				$loser_key = $lang2;
-			} else {
-				$cur_key = $lang2;
-				$loser_key = $lang1;
-			}
+    		if ($scores[$lang1] > $scores[$lang2]) {
+    			$cur_key = $lang1;
+    			$loser_key = $lang2;
+    		} else {
+    			$cur_key = $lang2;
+    			$loser_key = $lang1;
+    		}
 
-			$diff = $scores[$cur_key] - $scores[$loser_key];
+    		$diff = $scores[$cur_key] - $scores[$loser_key];
 
-			// $cur_key ({$dendogram_alias[$cur_key]}) wins 
-			// over $loser_key ({$dendogram_alias[$loser_key]}) 
-			// with a difference of $diff
-		}
+    		// $cur_key ({$dendogram_alias[$cur_key]}) wins 
+    		// over $loser_key ({$dendogram_alias[$loser_key]}) 
+    		// with a difference of $diff
+    	}
 
-		// found result in $i compares
+    	// found result in $i compares
 
         if ($this->_perl_compatible) {
             asort($scores);
@@ -1147,8 +1149,8 @@ class Text_LanguageDetect
             arsort($scores);
         }
 
-		return $scores;
-	}
+    	return $scores;
+    }
 
     /**
      * utf8-safe fast character iterator
