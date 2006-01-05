@@ -24,6 +24,30 @@ require_once 'PEAR.php';
  * Requires the langauge model database (lang.dat) that should have
  * accompanied this class definition in order to be instantiated.
  *
+ * Example usage:
+ *
+ * <code>
+ * require_once 'Text/LanguageDetect.php';
+ *
+ * $l = new Text_LanguageDetect;
+ *
+ * $stdin = fopen('php://stdin', 'r');
+ *
+ * echo "Supported languages:\n";
+ *
+ * $langs = $l->getLanguages();
+ * if (PEAR::isError($langs)) {
+ *     die($langs->getMessage());
+ * }
+ *
+ * sort($langs);
+ * echo join(', ', $langs);
+ *
+ * while ($line = fgets($stdin)) {
+ *     print_r($l->detect($line, 4));
+ * }
+ * </code>
+ *
  * @category   Text
  * @package    LanguageDetect
  * @author     Nicholas Pisarro <infinityminusnine+pear@gmail.com>
