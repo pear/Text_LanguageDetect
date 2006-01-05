@@ -7,24 +7,24 @@
  * @version CVS: $Id$
  */
 
-require_once '../Text/LanguageDetect.php';
+require_once 'Text/LanguageDetect.php';
 
 $l = new Text_LanguageDetect;
 
-$stdin = fopen('php://stdin','r');
+$stdin = fopen('php://stdin', 'r');
 
-echo "supported languages:\n";
+echo "Supported languages:\n";
 $langs = $l->getLanguages();
 if (PEAR::isError($langs)) {
 	die($langs->getMessage());
 }
 sort($langs);
-echo join(', ',$langs);
+echo join(', ', $langs);
 
 echo "\ntotal ", count($langs), "\n\n";
 
 while ($line = fgets($stdin)) {
-	print_r($l->detect($line,4));
+	print_r($l->detect($line, 4));
 }
 
 fclose($stdin);
