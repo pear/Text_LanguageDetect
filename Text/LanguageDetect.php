@@ -11,7 +11,7 @@
  * @category   Text
  * @package    Text_LanguageDetect
  * @author     Nicholas Pisarro <infinityminusnine+pear@gmail.com>
- * @copyright  2005 Nicholas Pisarro
+ * @copyright  2005-2006 Nicholas Pisarro
  * @license    http://www.debian.org/misc/bsd.license BSD
  * @version    CVS: $Id$
  */
@@ -281,7 +281,7 @@ class Text_LanguageDetect
 
         // reset the cluster cache if the number of languages changes
         // this will then have to be recalculated
-        if ($deleted > 0 && isset($this->_clusters)) {
+        if (isset($this->_clusters) && $deleted > 0) {
             unset($this->_clusters);
         }
 
@@ -907,7 +907,7 @@ class Text_LanguageDetect
      * @throws  PEAR_Error
      * @see     languageSimilarity()
      */
-    function clusterLanguages ()
+    function clusterLanguages()
     {
         // todo: set the maximum number of clusters
 
@@ -1095,7 +1095,7 @@ class Text_LanguageDetect
      * @return  array language scores (only those compared)
      * @throws  PEAR_Error
      */
-    function clusteredSearch ($str)
+    function clusteredSearch($str)
     {
 
         // clusterLanguages() will return a cached result if possible
