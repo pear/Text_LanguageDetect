@@ -9,7 +9,7 @@
  * PHP versions 4 and 5
  *
  * @category   Text
- * @package    LanguageDetect
+ * @package    Text_LanguageDetect
  * @author     Nicholas Pisarro <infinityminusnine+pear@gmail.com>
  * @copyright  2005 Nicholas Pisarro
  * @license    http://www.debian.org/misc/bsd.license BSD
@@ -49,7 +49,7 @@ require_once 'PEAR.php';
  * </code>
  *
  * @category   Text
- * @package    LanguageDetect
+ * @package    Text_LanguageDetect
  * @author     Nicholas Pisarro <infinityminusnine+pear@gmail.com>
  * @copyright  2005 Nicholas Pisarro
  * @license    http://www.debian.org/misc/bsd.license BSD
@@ -116,6 +116,15 @@ class Text_LanguageDetect
      * @see     setPerlCompatible()
      */
     var $_max_score = 0;
+
+    /**
+     * stores the result of the clustering operation
+     *
+     * @access  private
+     * @var     array
+     * @see     clusterLanguages()
+     */
+     var $_clusters;
 
     /**
      * Constructor
@@ -268,6 +277,12 @@ class Text_LanguageDetect
                     $deleted++;
                 }
             }
+        }
+
+        // reset the cluster cache if the number of languages changes
+        // this will then have to be recalculated
+        if ($deleted > 0 && isset($this->_clusters)) {
+            unset($this->_clusters);
         }
 
         return $deleted;
@@ -887,14 +902,18 @@ class Text_LanguageDetect
      * Uses a nearest neighbor technique to generate the maximum possible
      * number of dendograms from the similarity data.
      *
-     * @access public
-     * @return array language cluster data
-     * @throws PEAR_Error
-     * @see languageSimilarity()
+     * @access  public
+     * @return  array language cluster data
+     * @throws  PEAR_Error
+     * @see     languageSimilarity()
      */
     function clusterLanguages ()
     {
         // todo: set the maximum number of clusters
+
+        if (isset($this->_clusters)) {
+            return $this->_clusters;
+        }
 
         $langs = array_keys($this->_lang_db);
 
@@ -931,7 +950,8 @@ class Text_LanguageDetect
             }
             
             if (!$highest_key1) {
-                return PEAR::raiseError("$i. no highest key?\n");
+                // should not ever happen
+                return PEAR::raiseError("no highest key? (step: $i)");
             }
 
             if ($highest_score == 0) {
@@ -1034,6 +1054,10 @@ class Text_LanguageDetect
                         // this keeps track
             );
 
+
+        // saves the result in the object
+        $this->_clusters = $return_val;
+
         return $return_val;
     }
 
@@ -1051,7 +1075,7 @@ class Text_LanguageDetect
      *
      * this should find the language in considerably fewer compares 
      * (the equivalent of a binary search), however clusterLanguages() is costly
-     * and the loss of accuracy from this techniqueis significant.
+     * and the loss of accuracy from this technique is significant.
      *
      * This method may need to be 'fuzzier' in order to become more accurate.
      *
@@ -1059,16 +1083,16 @@ class Text_LanguageDetect
      * was very large, however in such cases some method of Bayesian inference
      * might be more helpful.
      *
-     * @see clusterLanguages()
-     * @access public
-     * @param string $str input string
-     * @return array language scores (only those compared)
+     * @see     clusterLanguages()
+     * @access  public
+     * @param   string $str input string
+     * @return  array language scores (only those compared)
      */
     function clusteredSearch ($str)
     {
 
-        // todo: this should be cached in the object, not calculated each time
-        // otherwise it defeats the point
+        // clusterLanguages() will return a cached result if possible
+        // so it's safe to call it every time
         $result = $this->clusterLanguages();
 
         $dendogram_start = $result['open_forks'];
