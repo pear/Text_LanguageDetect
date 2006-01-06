@@ -911,6 +911,12 @@ class Text_LanguageDetect
     {
         // todo: set the maximum number of clusters
 
+        // setup check
+        if (!$this->_setup_ok($err)) {
+            return $err;
+        }
+
+        // return cached result, if any
         if (isset($this->_clusters)) {
             return $this->_clusters;
         }
@@ -1087,6 +1093,7 @@ class Text_LanguageDetect
      * @access  public
      * @param   string $str input string
      * @return  array language scores (only those compared)
+     * @throws  PEAR_Error
      */
     function clusteredSearch ($str)
     {
@@ -1094,6 +1101,10 @@ class Text_LanguageDetect
         // clusterLanguages() will return a cached result if possible
         // so it's safe to call it every time
         $result = $this->clusterLanguages();
+
+        if (PEAR::isError($result)) {
+            return $result;
+        }
 
         $dendogram_start = $result['open_forks'];
         $dendogram_data = $result['fork_data'];
@@ -1172,6 +1183,8 @@ class Text_LanguageDetect
         } else {
             arsort($scores);
         }
+
+        // todo: needs to convert the cluster name to the real language name?
 
         return $scores;
     }
