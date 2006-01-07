@@ -170,9 +170,9 @@ class Text_LanguageDetect
     {
         // input check
         if (!file_exists($fname)) {
-            return PEAR::raiseError("Language database does not exist.");
+            return PEAR::raiseError('Language database does not exist.');
         } elseif (!is_readable($fname)) {
-            return PEAR::raiseError("Language database is not readable.");
+            return PEAR::raiseError('Language database is not readable.');
         }
 
         if (function_exists('file_get_contents')) {
@@ -1107,12 +1107,12 @@ class Text_LanguageDetect
         }
 
         $dendogram_start = $result['open_forks'];
-        $dendogram_data = $result['fork_data'];
+        $dendogram_data  = $result['fork_data'];
         $dendogram_alias = $result['name_map'];
         
 
         $sample_result = $this->_arr_rank($this->_trigram($str));
-        $sample_count = count($sample_result);
+        $sample_count  = count($sample_result);
 
         // input check
         if ($sample_count == 0) {
@@ -1244,6 +1244,8 @@ class Text_LanguageDetect
                 }
             }
 
+            return $char;
+
         // multi-byte chars
         } elseif ($ord >> 5 == 6) { // two-byte char
             $nextchar = $str{$counter++}; // get next byte
@@ -1266,23 +1268,21 @@ class Text_LanguageDetect
             }
 
             // tag on next byte
-            $char .= $nextchar; 
+            return $char . $nextchar; 
 
         } elseif ($ord >> 4  == 14) { // three-byte char
             
             // tag on next 2 bytes
-            $char .= $str{$counter++} . $str{$counter++}; 
+            return $char . $str{$counter++} . $str{$counter++}; 
 
         } elseif ($ord >> 3 == 30) { // four-byte char
 
             // tag on next 3 bytes
-            $char .= $str{$counter++} . $str{$counter++} . $str{$counter++};
+            return $char . $str{$counter++} . $str{$counter++} . $str{$counter++};
 
         } else {
             // error?
         }
-
-        return $char;
     }
     
 }
