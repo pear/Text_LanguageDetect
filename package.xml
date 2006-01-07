@@ -1,46 +1,70 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
 <package version="1.0">
-	<name>Text_LanguageDetect</name>
-	<summary>Language detection class</summary>
-	<description>Text_LanguageDetect can identify 52 human languages from text samples and return confidence scores for each.</description>
+    <name>Text_LanguageDetect</name>
+    <summary>Language detection class</summary>
+    <description>Text_LanguageDetect can identify 52 human languages from text samples and return confidence scores for each.</description>
 
-	<maintainers>
-		<maintainer>
-			<user>taak</user>
-			<name>Nicholas Pisarro</name>
-			<email>infinityminusnine+pear@gmail.com</email>
-			<role>lead</role>
-		</maintainer>
-	</maintainers>
+    <maintainers>
+        <maintainer>
+            <user>taak</user>
+            <name>Nicholas Pisarro</name>
+            <email>infinityminusnine+pear@gmail.com</email>
+            <role>lead</role>
+        </maintainer>
+    </maintainers>
 
-	<release>
-		<version>0.1.0</version>
-		<date>2006-01-04</date>
-		<license>BSD</license>
-		<state>alpha</state>
-		<notes>Initial PEAR release</notes>
+    <release>
+        <version>0.1.1</version>
+        <date>2006-01-06</date>
+        <license>BSD</license>
+        <state>alpha</state>
+        <notes>
+            * Output of clustering now cached
+            * Fix: better error checking in clustering functions
+            * Fix: clusteredSearch() now handles null strings gracefully
+            * Compare order is preserved in clusteredSearch() results
+            * Slight speed improvement to utf8 iterator
+        </notes>
 
-		<filelist>
-			<file role="php" name="Text/LanguageDetect.php" >
-				<replace from="@package_version@" to="version" type="package-info" />
-				<replace from="@data_dir@" to="data_dir" type="pear-config" />
-			</file>
-			<file role="data" name="data/lang.dat" install-as="lang.dat" />
-			<file role="test" name="tests/unittest.php"/>
-			<file role="doc" name="docs/example_clui.php"/>
-			<file role="doc" name="docs/example_web.php"/>
-		</filelist>
+        <filelist>
+            <file role="php" name="Text/LanguageDetect.php" >
+                <replace from="@package_version@" to="version" type="package-info" />
+                <replace from="@data_dir@" to="data_dir" type="pear-config" />
+            </file>
+            <file role="data" name="data/lang.dat" install-as="lang.dat" />
+            <file role="test" name="tests/unittest.php"/>
+            <file role="doc" name="docs/example_clui.php"/>
+            <file role="doc" name="docs/example_web.php"/>
+        </filelist>
 
-	</release>
+        <deps>
+            <dep type="php" rel="ge" version="4.0.3" />
+            <dep type="ext" rel="has" optional="yes">mbstring</dep>
+        </deps>
 
-	<changelog>
-		<release>
-			<version>0.1.0</version>
-			<date>2006-01-04</date>
-			<license>BSD</license>
-			<state>alpha</state>
-			<notes>Initial PEAR release</notes>
-		</release>
-	</changelog>
+    </release>
+
+    <changelog>
+        <release>
+            <version>0.1.1</version>
+            <date>2006-01-06</date>
+            <license>BSD</license>
+            <state>alpha</state>
+            <notes>
+                * Output of clustering now cached
+				* Fix: better error checking in clustering functions
+                * Fix: clusteredSearch() now handles null strings gracefully
+                * Compare order is preserved in clusteredSearch() results
+                * Slight speed improvement to utf8 iterator
+            </notes>
+        </release>
+        <release>
+            <version>0.1.0</version>
+            <date>2006-01-04</date>
+            <license>BSD</license>
+            <state>alpha</state>
+            <notes>Initial PEAR release</notes>
+        </release>
+    </changelog>
 </package>
