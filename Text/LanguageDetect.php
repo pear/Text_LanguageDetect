@@ -1114,6 +1114,11 @@ class Text_LanguageDetect
         $sample_result = $this->_arr_rank($this->_trigram($str));
         $sample_count = count($sample_result);
 
+        // input check
+        if ($sample_count == 0) {
+            return array();
+        }
+
         $i = 0; // counts the number of steps
         
         foreach ($dendogram_start as $lang) {
@@ -1178,13 +1183,26 @@ class Text_LanguageDetect
 
         // found result in $i compares
 
-        if ($this->_perl_compatible) {
-            asort($scores);
-        } else {
-            arsort($scores);
-        }
+        // rather than sorting the result, preserve it so that you can see
+        // which paths the algorithm decided to take along the tree
 
-        // todo: needs to convert the cluster name to the real language name?
+        // but sometimes the last item is only the second highest
+        if (   ($this->_perl_compatible  && (end($scores) > prev($scores)))
+            || (!$this->_perl_compatible && (end($scores) < prev($scores)))) {
+
+            $real_last_score = current($scores);
+            $real_last_key = key($scores);
+
+            // swaps the 2nd-to-last item for the last item
+            unset($scores[$real_last_key]);
+            $scores[$real_last_key] = $real_last_score;
+        }
+            
+
+        if (!$this->_perl_compatible) {
+            $scores = array_reverse($scores, true);
+            // second param requires php > 4.0.3
+        }
 
         return $scores;
     }
