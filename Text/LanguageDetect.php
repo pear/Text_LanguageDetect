@@ -124,7 +124,7 @@ class Text_LanguageDetect
      * @var     array
      * @see     clusterLanguages()
      */
-     var $_clusters;
+    var $_clusters;
 
     /**
      * Constructor
@@ -1252,20 +1252,38 @@ class Text_LanguageDetect
         } elseif ($ord >> 5 == 6) { // two-byte char
             $nextchar = $str{$counter++}; // get next byte
 
-            // lower case latin accented characters
-            if ($special_convert && $ord == 195) {
-                $nextord = ord($nextchar);
-                $nextord_adj = $nextord + 64;
-                // for a reference, see 
-                // http://www.ramsch.org/martin/uni/fmi-hp/iso8859-1.html
+            // lower-casing of non-ascii characters is still incomplete
 
-                // &Agrave; - &THORN; but not &times;
-                if (    $nextord_adj >= 192
-                        && $nextord_adj <= 222 
-                        && $nextord_adj != 215) {
+            if ($special_convert) {
+                // lower case latin accented characters
+                if ($ord == 195) {
+                    $nextord = ord($nextchar);
+                    $nextord_adj = $nextord + 64;
+                    // for a reference, see 
+                    // http://www.ramsch.org/martin/uni/fmi-hp/iso8859-1.html
 
-                    // lower case
-                    $nextchar = chr($nextord + 32); 
+                    // &Agrave; - &THORN; but not &times;
+                    if (    $nextord_adj >= 192
+                            && $nextord_adj <= 222 
+                            && $nextord_adj != 215) {
+
+                        $nextchar = chr($nextord + 32); 
+                    }
+
+                // lower case cyrillic alphabet
+                } elseif ($ord == 208) {
+                    $nextord = ord($nextchar);
+                    // if A - Pe
+                    if ($nextord >= 144 && $nextord <= 159) {
+                        // lower case
+                        $nextchar = chr($nextord + 32);
+
+                    // if Er - Ya
+                    } elseif ($nextord >= 160 && $nextord <= 175) {
+                        // lower case
+                        $char = chr(209); // == $ord++
+                        $nextchar = chr($nextord - 32);
+                    }
                 }
             }
 
