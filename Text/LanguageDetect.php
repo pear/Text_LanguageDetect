@@ -208,7 +208,7 @@ class Text_LanguageDetect
             $err = PEAR::raiseError('Language database is not an array.');
             return false;
 
-        } elseif (!count($this->_lang_db)) {
+        } elseif (empty($this->_lang_db)) {
             $err =  PEAR::raiseError('Language database has no elements.');
             return false;
 
@@ -611,8 +611,10 @@ class Text_LanguageDetect
      * Otherwise, it's 0-1 with 1 being most similar.
      * 
      * The $sample text should be at least a few sentences in length;
-     * should be ascii-7 or utf8 encoded, if other and the mbstring extension
-     * is present it will try to detect and convert.
+     * should be ascii-7 or utf8 encoded, if another and the mbstring extension
+     * is present it will try to detect and convert. However, experience has
+     * shown that mb_detect_encoding() *does not work very well* with at least 
+     * some types of encoding.
      *
      * @access  public
      * @param   string  $sample a sample of text to compare.
@@ -641,7 +643,7 @@ class Text_LanguageDetect
 
             $encoding = mb_detect_encoding($sample);
             if ($encoding != 'ASCII' && $encoding != 'UTF-8') {
-                $sample = mb_convert_encoding($sample, 'UTF-8');
+                $sample = mb_convert_encoding($sample, 'UTF-8', $encoding);
             }
         }
 
@@ -713,7 +715,7 @@ class Text_LanguageDetect
         // if top language has the maximum possible score,
         // then the top score will have been picked at random
         if (    !is_array($scores) 
-                || !count($scores) 
+                || empty($scores) 
                 || current($scores) == $this->_max_score) {
 
             return null;
@@ -759,7 +761,7 @@ class Text_LanguageDetect
         // if most similar language has the max score, it 
         // will have been picked at random
         if (    !is_array($scores) 
-                || !count($scores) 
+                || empty($scores) 
                 || current($scores) == $this->_max_score) {
 
             return null;
