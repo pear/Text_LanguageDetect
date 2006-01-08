@@ -5,18 +5,18 @@
  * @version CVS: $Id$
  */
 
-require_once 'Text/LanguageDetect.php';
+require_once '../Text/LanguageDetect.php';
 require_once 'PHPUnit.php';
 
 class langtest extends PHPUnit_TestCase {
 
     function langtest ($name)
-	{
+    {
         $this->PHPUnit_TestCase($name);
     }
 
     function setup ()
-	{
+    {
         $this->x = new Text_LanguageDetect;
 
         if (!$this->x->_setup_ok($err)) {
@@ -25,12 +25,12 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function tearDown ()
-	{
+    {
         unset($this->x);
     }
 
     function test_setup ()
-	{
+    {
         $err_result = $this->x->_setup_ok($err_obj);
 
         if (PEAR::isError($err_obj)) {
@@ -41,7 +41,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_splitter ()
-	{
+    {
         $str = 'hello';
 
         $result = $this->x->_trigram($str);
@@ -63,7 +63,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_splitter2 ()
-	{
+    {
         $str = 'resumé';
  
         $result = $this->x->_trigram($str);
@@ -83,7 +83,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_sort ()
-	{
+    {
         $arr = array('a' => 1, 'b' => 2, 'c' => 2);
         $this->x->_bub_sort($arr);
 
@@ -93,7 +93,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_error ()
-	{
+    {
         // this test passes the object a series of bad strings to see how it handles them
 
         $result = $this->x->detectSimple("");
@@ -119,7 +119,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_omit ()
-	{
+    {
         $str = 'This function may return Boolean FALSE, but may also return a non-Boolean value which evaluates to FALSE, such as 0 or "". Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.';
 
         $myobj = new Text_LanguageDetect;
@@ -158,7 +158,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_french_db ()
-	{
+    {
 
         $safe_model = array(
             "es " => 0,     " de" => 1,     "de " => 2,     " le" => 3,     "ent" => 4,     
@@ -235,7 +235,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_english_db ()
-	{
+    {
 
         $realdb = array(
             " th" => 0,     "the" => 1,     "he " => 2,     "ed " => 3,     " to" => 4,     
@@ -318,7 +318,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_confidence ()
-	{
+    {
         $str = 'The next thing to notice is the Content-length header. The Content-length header notifies the server of the size of the data that you intend to send. This prevents unexpected end-of-data errors from the server when dealing with binary data, because the server will read the specified number of bytes from the data stream regardless of any spurious end-of-data characters.';
 
         $result = $this->x->detectConfidence($str);
@@ -335,7 +335,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_long_example ()
-	{
+    {
     // an example that is more than 300 trigrams long
         $str = 'The Italian Renaissance began the opening phase of the Renaissance, a period of great cultural change and achievement from the 14th to the 16th century. The word renaissance means "rebirth," and the era is best known for the renewed interest in the culture of classical antiquity. The Italian Renaissance began in northern Italy, centering in Florence. It then spread south, having an especially significant impact on Rome, which was largely rebuilt by the Renaissance popes. The Italian Renaissance is best known for its cultural achievements. This includes works of literature by such figures as Petrarch, Castiglione, and Machiavelli; artists such as Michaelangelo and Leonardo da Vinci, and great works of architecture such as The Duomo in Florence and St. Peter\'s Basilica in Rome. At the same time, present-day historians also see the era as one of economic regression and of little progress in science. Furthermore, some historians argue that the lot of the peasants and urban poor, the majority of the population, worsened during this period.';
     
@@ -1051,7 +1051,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_french ()
-	{
+    {
         $this->x->setPerlCompatible();
         $str = "Verifions que le détecteur de langues marche";
 
@@ -1201,7 +1201,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_russian ()
-	{
+    {
         $str = 'авай проверить  узнает ли наш угадатель русски язык';
 
         $this->x->setPerlCompatible();
@@ -1291,7 +1291,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_ranker ()
-	{
+    {
         $str = 'is it s i';
 
         $result = $this->x->_arr_rank($this->x->_trigram($str));
@@ -1301,7 +1301,7 @@ class langtest extends PHPUnit_TestCase {
 
 
     function test_count ()
-	{
+    {
         $langs = $this->x->getLanguages();
         
         $count = $this->x->getLanguageCount();
@@ -1314,7 +1314,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_language_compare ()
-	{
+    {
         $this->x->setPerlCompatible(true);
         $eng_dan = $this->x->languageSimilarity('english', 'danish');
         $nor_dan = $this->x->languageSimilarity('norwegian', 'danish');
@@ -1362,7 +1362,7 @@ class langtest extends PHPUnit_TestCase {
 
 
     function test_compatibility ()
-	{
+    {
         $str = "I am the very model of a modern major general.";
 
 
@@ -1389,7 +1389,7 @@ class langtest extends PHPUnit_TestCase {
     }
 
     function test_omit_error ()
-	{
+    {
         $str = 'On January 29, 1737, Thomas Paine was born in Thetford, England. His father, a corseter, had grand visions for his son, but by the age of 12, Thomas had failed out of school. The young Paine began apprenticing for his father, but again, he failed.';
 
         $myobj = new Text_LanguageDetect;
@@ -1404,10 +1404,33 @@ class langtest extends PHPUnit_TestCase {
 
         $this->assertTrue(PEAR::isError($result));
     }
-        
-    
+
+    function test_cyrillic ()
+    {
+        // tests whether the cyrillic lower-casing works
+
+        $uppercased = 'А    Б    В    Г    Д    Е    Ж    З    И    Й    К    Л    М    Н    О    П'
+                     . 'Р    С    Т    У    Ф    Х    Ц    Ч    Ш    Щ    Ъ    Ы    Ь    Э    Ю    Я';
+
+        $lowercased = 'а    б    в    г    д    е    ж    з    и    й    к    л    м    н    о    п'
+                    . 'р    с    т    у    ф    х    ц    ч    ш    щ    ъ    ы    ь    э    ю    я';
+
+        $this->assertEquals(strlen($uppercased), strlen($lowercased));
+
+        $i = 0;
+        $j = 0;
+        while ($i < strlen($uppercased)) {
+            $u = Text_LanguageDetect::_next_char($uppercased, $i, true);
+            $l = Text_LanguageDetect::_next_char($lowercased, $j, true);
+            $this->assertEquals($u, $l);
+        }
+
+        $this->assertEquals($i, $j);
+        $this->assertEquals($i, strlen($uppercased));
+    }        
+
     function test_detection ()
-	{
+    {
 
         // WARNING: the below lines may make your terminal go ape! be warned
         // see http://www.vim.org/htmldoc/mbyte.html for using vim with mb strings
