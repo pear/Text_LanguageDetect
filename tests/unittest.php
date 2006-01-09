@@ -1463,7 +1463,7 @@ class langtest extends PHPUnit_TestCase {
             "english" => "This is a test of the language checker",
             "french" => "Verifions que le détecteur de langues marche",
             "polish" => "Sprawdźmy, czy odgadywacz języków pracuje",
-            "russian" => "авай проверить  узнает ли наш угадатель русски язык",
+            "russian" => "Давай проверим узнает ли нашь угадыватель русский язык",
             "spanish" => "La respuesta de los acreedores a la oferta argentina para salir del default no ha sido muy positiv",
             "romanian" => "în acest sens aparţinînd Adunării Generale a organizaţiei, în ciuda faptului că mai multe dintre solicitările organizaţiei privind organizarea scrutinului nu au fost soluţionate",
             "albanian" => "kaluan ditën e fundit të fushatës në shtetet kryesore për të siguruar sa më shumë votues.",
