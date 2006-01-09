@@ -1433,7 +1433,6 @@ class langtest extends PHPUnit_TestCase {
     {
 
         // WARNING: the below lines may make your terminal go ape! be warned
-        // see http://www.vim.org/htmldoc/mbyte.html for using vim with mb strings
 
 
 
@@ -1551,6 +1550,6 @@ $suite = new PHPUnit_TestSuite('langtest');
 $result = PHPUnit::run($suite);
 echo $result->toString();
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 encoding=utf-8: */
 
 ?>
