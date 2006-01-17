@@ -124,6 +124,8 @@ class langtest extends PHPUnit_TestCase {
 
         $myobj = new Text_LanguageDetect;
 
+        $myobj->_use_unicode_narrowing = false;
+
         $count = $myobj->getLanguageCount();
         $returnval = $myobj->omitLanguages('english');
         $newcount = $myobj->getLanguageCount();
@@ -155,6 +157,20 @@ class langtest extends PHPUnit_TestCase {
         $this->assertTrue(isset($result['italian']));
 
         unset($myobj);
+    }
+
+    function test_perl_compatibility()
+    {
+        // if this test fails, then many of the others will
+
+        $myobj = new Text_LanguageDetect;
+        $myobj->setPerlCompatible(true);
+
+        $testtext = "hello";
+
+        $result = $myobj->_trigram($testtext);
+
+        $this->assertTrue(!isset($result[' he']));
     }
 
     function test_french_db ()
@@ -1112,6 +1128,9 @@ class langtest extends PHPUnit_TestCase {
         //ksort($ranked);
         //$this->assertEquals($correct_ranks,$ranked);
         $this->assertEquals(count($correct_ranks), count($ranked), "different number of trigrams found");
+        //print_r($correct_ranks);
+        //print_r($ranked);
+        //print_r(array_diff_assoc($correct_ranks, $ranked));
 
         if (count($correct_ranks) == count($ranks)) {
             foreach ($correct_ranks as $key => $value) {
@@ -1183,9 +1202,17 @@ class langtest extends PHPUnit_TestCase {
                 $this->assertEquals($distances[$key]['baserank'], $ranked[$key], "baserank for $key");
                 $this->assertEquals($distances[$key]['refrank'], $french_ranks[$key], "refrank for $key");
                 $this->assertEquals($distances[$key]['change'], $difference, "difference for $key");
+
+                if ($distances[$key]['baserank'] != $ranked[$key] || $distances[$key]['refrank'] != $french_ranks[$key] || $distances[$key]['change'] != $difference) {
+                    
+                    // don't flood
+                    if ($local_errors++ > 10) {
+                        $this->assertTrue(false, 'Exiting to prevent flooding');
+                        break;
+                    }
+                }
+
             }
-
-
 
             $sumchange += $difference;
         }
@@ -1276,6 +1303,15 @@ class langtest extends PHPUnit_TestCase {
                 $this->assertEquals($correct_ranks[$key]['baserank'], $ranked[$key], "baserank for $key");
                 $this->assertEquals($correct_ranks[$key]['refrank'], $russian[$key], "refrank for $key");
                 $this->assertEquals($correct_ranks[$key]['change'], $difference, "difference for $key");
+
+                if ($correct_ranks[$key]['baserank'] != $ranked[$key] || $correct_ranks[$key]['refrank'] != $russian[$key] || $correct_ranks[$key]['change'] != $difference) {
+
+                    // don't flood
+                    if ($local_errors++ > 6) {
+                        $this->assertTrue(false, 'Exiting to prevent flooding');
+                        break;
+                    }
+                }
             }
 
             $sumchange += $difference;
@@ -1402,7 +1438,7 @@ class langtest extends PHPUnit_TestCase {
 
         $result = $myobj->detectSimple($str);
 
-        $this->assertTrue(PEAR::isError($result));
+        $this->assertTrue(PEAR::isError($result), gettype($result));
     }
 
     function test_cyrillic ()
@@ -1426,10 +1462,141 @@ class langtest extends PHPUnit_TestCase {
         }
 
         $this->assertEquals($i, $j);
-        $this->assertEquals($i, strlen($uppercased));
-    }        
+        $this->assertEquals($i, strlen($lowercased));
+    }
 
-    function test_detection ()
+    function test_block_detection()
+    {
+        $exp_output = <<<EOF
+Array
+(
+    [Basic Latin] => 37
+    [CJK Unified Ideographs] => 2
+    [Hiragana] => 1
+    [Latin-1 Supplement] => 4
+)
+EOF;
+        $teststr = 'lsdkfj あ 葉  叶 slskdfj s Åj;sdklf ÿjs;kdjåf î';
+        $result = $this->x->detectUnicodeBlocks($teststr, false);
+
+        ksort($result);
+        ob_start();
+        print_r($result);
+        $str_result = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(trim($exp_output), trim($str_result));
+
+        // test whether skipping the spaces reduces the basic latin count
+        $result2 = $this->x->detectUnicodeBlocks($teststr, true);
+        $this->assertTrue($result2['Basic Latin'] < $result['Basic Latin']);
+
+        $result3 = $this->x->unicodeBlockName('и');
+        $this->assertEquals('Cyrillic', $result3);
+
+        $this->assertEquals('Basic Latin', $this->x->unicodeBlockName('A'));
+
+        // see what happens when you try an unassigned range
+        $utf8 = $this->code2utf(0x0800);
+
+        $this->assertEquals(false, $this->x->unicodeBlockName($utf8));
+
+        // try unicode vals in several different ranges
+        $unicode['Supplementary Private Use Area-A'] = 0xF0001;
+        $unicode['Supplementary Private Use Area-B'] = 0x100001;
+        $unicode['CJK Unified Ideographs Extension B'] = 0x20001;
+        $unicode['Ugaritic'] = 0x10381;
+        $unicode['Gothic'] = 0x10331;
+        $unicode['Low Surrogates'] = 0xDC01;
+        $unicode['CJK Unified Ideographs'] = 0x4E00;
+        $unicode['Glagolitic'] = 0x2C00;
+        $unicode['Latin Extended Additional'] = 0x1EFF;
+        $unicode['Devanagari'] = 0x0900;
+        $unicode['Hebrew'] = 0x0590;
+        $unicode['Latin Extended-B'] = 0x024F;
+        $unicode['Latin-1 Supplement'] = 0x00FF;
+        $unicode['Basic Latin'] = 0x007F;
+
+        foreach ($unicode as $range => $codepoint) {
+            $result = $this->x->unicodeBlockName($this->code2utf($codepoint));
+            if (PEAR::isError($result)) {
+                $this->assertTrue(false, $codepoint . ', ' . $result->getMessage());
+            } else {
+                $this->assertEquals($range, $result, $codepoint);
+            }
+        }
+    }
+
+
+    // utility function
+    // found in http://www.php.net/manual/en/function.utf8-encode.php#49336
+    function code2utf($num)
+    {
+        if ($num < 128) {
+           return chr($num);
+
+        } elseif ($num < 2048) {
+           return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
+
+        } elseif ($num < 65536) {
+           return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+
+        } elseif ($num < 2097152) {
+            return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+        } else {
+            return '';
+        }
+    }
+
+    function test_utf8len()
+    {
+        $str = 'Iñtërnâtiônàlizætiøn';
+        $this->assertEquals(20, $this->x->utf8strlen($str), utf8_decode($str));
+
+        $str = '時期日';
+        $this->assertEquals(3, $this->x->utf8strlen($str), utf8_decode($str));
+    }
+
+    function test_unicode()
+    {
+        // test whether it can get the right unicode values for utf8 chars
+
+        $chars['ת'] = 0x5EA;
+
+        $chars['ç'] = 0x00E7;
+
+        $chars['a'] = 0x0061;
+
+        $chars['Φ'] = 0x03A6;
+
+        $chars['И'] = 0x0418;
+
+        $chars['ڰ'] = 0x6B0;
+
+        $chars['Ụ'] = 0x1EE4;
+
+        $chars['놔'] = 0xB194;
+
+        $chars['遮'] = 0x906E;
+
+        $chars['怀'] = 0x6000;
+
+        $chars['ฤ'] = 0x0E24;
+
+        $chars['Я'] = 0x042F;
+
+        $chars['ü'] = 0x00FC;
+
+        $chars['Đ'] = 0x0110;
+
+        $chars['א'] = 0x05D0;
+        
+
+        foreach ($chars as $utf8 => $unicode) {
+            $this->assertEquals($unicode, $this->x->_utf8char2unicode($utf8), $utf8);
+        }
+    }
+
+    function test_detection()
     {
 
         // WARNING: the below lines may make your terminal go ape! be warned
