@@ -6,6 +6,9 @@
  * Attempts to detect the language of a sample of text by correlating ranked
  * 3-gram frequencies to a table of 3-gram frequencies of known languages.
  *
+ * Implements a version of a technique originally proposed by Cavnar & Trenkle 
+ * (1994): "N-Gram-Based Text Categorization" 
+ *
  * PHP versions 4 and 5
  *
  * @category   Text
@@ -14,9 +17,12 @@
  * @copyright  2005-2006 Nicholas Pisarro
  * @license    http://www.debian.org/misc/bsd.license BSD
  * @version    CVS: $Id$
+ * @link       http://pear.php.net/package/Text_LanguageDetect/
+ * @link       http://langdetect.blogspot.com/
  */
 
 require_once 'PEAR.php';
+require_once 'LanguageDetect/Parser.php';
 
 /**
  * Language detection class
@@ -61,6 +67,9 @@ class Text_LanguageDetect
 {
     /** 
      * The filename that stores the trigram data for the detector
+     *
+     * If this value starts with a slash (/) or a dot (.) the value of 
+     * $this->_data_dir will be ignored
      * 
      * @var      string
      * @access   private
@@ -68,20 +77,25 @@ class Text_LanguageDetect
     var $_db_filename = 'lang.dat';
 
     /**
+     * The filename that stores the unicode block definitions
+     *
+     * If this value starts with a slash (/) or a dot (.) the value of 
+     * $this->_data_dir will be ignored
+     * 
+     * @var string
+     * @access private
+     */
+    var $_unicode_db_filename = 'unicode_blocks.dat';
+
+    /**
      * The data directory
+     *
+     * Should be set by PEAR installer
      *
      * @var      string
      * @access   private
      */
     var $_data_dir = '@data_dir@';
-
-    /**
-     * The size of the trigram data arrays
-     * 
-     * @var      int
-     * @access   private
-     */
-    var $_threshold = 300;
 
     /**
      * The trigram data for comparison
@@ -97,13 +111,28 @@ class Text_LanguageDetect
     var $_lang_db = array();
 
     /**
-     * Whether or not to simulate perl's Language::Guess exactly
-     * 
-     * @access  private
-     * @var     bool
-     * @see     setPerlCompatible()
+     * stores the map of the trigram data to unicode characters
+     *
+     * @access private
+     * @var array
      */
-    var $_perl_compatible = false;
+    var $_unicode_map;
+
+    /**
+     * stores any errors during setup
+     *
+     * @access private
+     * @var PEAR_Error
+     */
+    var $_setup_error;
+
+    /**
+     * The size of the trigram data arrays
+     * 
+     * @var      int
+     * @access   private
+     */
+    var $_threshold = 300;
 
     /**
      * the maximum possible score.
@@ -116,6 +145,25 @@ class Text_LanguageDetect
      * @see     setPerlCompatible()
      */
     var $_max_score = 0;
+
+    /**
+     * Whether or not to simulate perl's Language::Guess exactly
+     * 
+     * @access  private
+     * @var     bool
+     * @see     setPerlCompatible()
+     */
+    var $_perl_compatible = false;
+
+    /**
+     * Whether to use the unicode block detection to speed up processing
+     *
+     * This is a stub flag; there is no accessor function to turn it on or off
+     *
+     * @access private
+     * @var bool
+     */
+    var $_use_unicode_narrowing = true;
 
     /**
      * stores the result of the clustering operation
@@ -135,7 +183,23 @@ class Text_LanguageDetect
      */
     function Text_LanguageDetect()
     {
-        $this->_lang_db = $this->_readdb($this->_get_db_loc());
+        $data = $this->_readdb($this->_db_filename);
+        if (PEAR::isError($data)) {
+            // if error, save the error message
+            $this->_setup_error = $data;
+
+        } else {
+            $this->_lang_db = $data['trigram'];
+
+            if (isset($data['trigram-unicodemap'])) {
+                $this->_unicode_map = $data['trigram-unicodemap'];
+            }
+
+            // Not yet implemented:
+            if (isset($data['trigram-clusters'])) {
+                $this->_clusters = $data['trigram-clusters'];
+            }
+        }
     }
 
     /**
@@ -144,15 +208,22 @@ class Text_LanguageDetect
      * @access    private
      * @return    string    expected path to the language model database
      */
-    function _get_db_loc()
+    function _get_data_loc($fname)
     {
+        // if filename starts with a slash, assume it's an absolute pathname
+        // and skip whatever is in $this->_data_dir
+        if ($fname{0} == '/' || $fname{0} == '.') {
+            return $fname;
+
         // checks if this has been installed properly
-        if ($this->_data_dir != '@' . 'data_dir' . '@') {
+        } elseif ($this->_data_dir != '@' . 'data_dir' . '@') {
             // if the data dir was set by the PEAR installer, use that
-            return $this->_data_dir . '/Text_LanguageDetect/' . $this->_db_filename;
+            return $this->_data_dir . '/Text_LanguageDetect/' . $fname;
+
         } else {
+            // assume this was just unpacked somewhere
             // try the local working directory if otherwise
-            return '../data/' . $this->_db_filename;
+            return '../data/' . $fname;
         }
     }
 
@@ -168,6 +239,9 @@ class Text_LanguageDetect
      */
     function _readdb($fname)
     {
+        // finds the correct data dir
+        $fname = $this->_get_data_loc($fname);
+
         // input check
         if (!file_exists($fname)) {
             return PEAR::raiseError('Language database does not exist.');
@@ -188,6 +262,7 @@ class Text_LanguageDetect
         }
     }
 
+
     /**
      * Checks if this object is ready to detect languages
      * 
@@ -197,11 +272,10 @@ class Text_LanguageDetect
      */
     function _setup_ok(&$err)
     {
-
-        if (PEAR::isError($this->_lang_db)) {
+        if (PEAR::isError($this->_setup_error)) {
             // if there was an error from when the language database was loaded
             // then return that error
-            $err = $this->_lang_db;
+            $err = $this->_setup_error;
             return false;
 
         } elseif (!is_array($this->_lang_db)) {
@@ -379,68 +453,20 @@ class Text_LanguageDetect
     /**
      * Converts a piece of text into trigrams
      *
+     * Superceded by the Text_LanguageDetect_Parser class 
+     *
      * @access    private
      * @param     string    $text    text to convert
      * @return    array              array of trigram frequencies
      */
     function _trigram($text)
     {
-        $text_length = strlen($text);
-
-        // input check
-        if ($text_length < 3) {
-            return array();
-        }
-
-        // each unique trigram is a key in this associative array
-        // number of times it appears in the string is the value
-        $trigram_freqs = array();
-        
-        // $i keeps count of which byte in the string we're working in
-        // not which character, since characters could take from 1 - 4 bytes
-        $i = 0;
-
-        // $a, $b and $c each contain a single character
-        // with each iteration $b is set to $c, $a is set to $b and $c is set 
-        // to the next character in $text
-        $a = $this->_next_char($text, $i, true);
-        $b = $this->_next_char($text, $i, true);
-
-        // starts off with the first two characters plus a space
-        if (!$this->_perl_compatible) {
-            if ($a != ' ') { // exclude trigrams with 2 contiguous spaces
-                $trigram_freqs[" $a$b"] = 1;
-            }
-        }
-
-        while ($i < $text_length) {
-
-            $c = $this->_next_char($text, $i, true);
-            // $i is incremented by reference in the line above
-
-            // exclude trigrams with 2 contiguous spaces
-            if (!($b == ' ' && ($a == ' ' || $c == ' '))) {
-                if (!isset($trigram_freqs[$a . $b . $c])) {
-                   $trigram_freqs[$a . $b . $c] = 1;
-                } else {
-                    $trigram_freqs[$a . $b . $c]++;
-                }
-            }
-
-            $a = $b;
-            $b = $c;
-        }
-
-        // end with the last two characters plus a space
-        if ($b != ' ') { // exclude trigrams with 2 contiguous spaces
-            if (!isset($trigram_freqs["$a$b "])) {
-                $trigram_freqs["$a$b "] = 1;
-            } else {
-                $trigram_freqs["$a$b "]++;
-            }
-        }
-
-        return $trigram_freqs;
+        $s = new Text_LanguageDetect_Parser($text);
+        $s->prepareTrigram();
+        $s->prepareUnicode(false);
+        $s->setPadStart(!$this->_perl_compatible);
+        $s->analyze();
+        return $s->getTrigramFreqs();
     }
 
     /**
@@ -448,7 +474,7 @@ class Text_LanguageDetect
      *
      * Thresholds (cuts off) the list at $this->_threshold
      *
-     * @access    private
+     * @access    protected
      * @param     array     $arr     array of trgram 
      * @return    array              ranks of trigrams
      */
@@ -544,12 +570,15 @@ class Text_LanguageDetect
     }
 
     /**
-     * Calculates a statistical difference between two sets of ranked trigrams
+     * Calculates a linear rank-order distance statistic between two sets of 
+     * ranked trigrams
      *
      * Sums the differences in rank for each trigram. If the trigram does not 
      * appear in both, consider it a difference of $this->_threshold.
      *
-     * Based on the statistical method used by perl's Language::Guess.
+     * This distance measure was proposed by Cavnar & Trenkle (1994). Despite
+     * its simplicity it has been shown to be highly accurate for language
+     * identification tasks.
      *
      * @access  private
      * @param   array    $arr1  the reference set of trigram ranks
@@ -573,6 +602,9 @@ class Text_LanguageDetect
         }
 
         return $sumdist;
+
+        // todo: there are other distance statistics to try, e.g. relative
+        //       entropy, but they're probably more costly to compute
     }
 
     /**
@@ -633,11 +665,12 @@ class Text_LanguageDetect
         }
 
         // input check
-        if ($sample == '' || !preg_match('/\S/', $sample)) {
+        if (!Text_LanguageDetect_Parser::validateString($sample)) {
             return array();
         }
 
-        // check char encoding (only if mbstring extension is compiled)
+        // check char encoding
+        // (only if mbstring extension is compiled and PHP > 4.0.6)
         if (function_exists('mb_detect_encoding') 
             && function_exists('mb_convert_encoding')) {
 
@@ -647,22 +680,75 @@ class Text_LanguageDetect
             }
         }
 
-        $trigram_freqs = $this->_arr_rank($this->_trigram($sample));
+        $sample_obj = new Text_LanguageDetect_Parser($sample);
+        $sample_obj->prepareTrigram();
+        if ($this->_use_unicode_narrowing) {
+            $sample_obj->prepareUnicode();
+        }
+        $sample_obj->setPadStart(!$this->_perl_compatible);
+        $sample_obj->analyze();
+
+        $trigram_freqs =& $sample_obj->getTrigramRanks();
         $trigram_count = count($trigram_freqs);
- 
+
         if ($trigram_count == 0) {
             return array();
         }
 
-        // normalize the score
-        // by dividing it by the number of trigrams present
-        foreach ($this->_lang_db as $lang => $lang_arr) {
+        $scores = array();
+
+        // use unicode block detection to narrow down the possibilities
+        if ($this->_use_unicode_narrowing) {
+            $blocks =& $sample_obj->getUnicodeBlocks();
+
+            if (is_array($blocks)) {
+                $present_blocks = array_keys($blocks);
+            } else {
+                return PEAR::raiseError('Error during block detection');
+            }
+
+            $possible_langs = array();
+
+            foreach ($present_blocks as $blockname) {
+                if (isset($this->_unicode_map[$blockname])) {
+
+                    $possible_langs = array_merge(
+                        $possible_langs,
+                        array_keys($this->_unicode_map[$blockname])
+                    );
+
+                    // todo: faster way to do this?
+                }
+            }
+
+            // could also try an intersect operation rather than a union
+            // in other words, choose languages whose trigrams contain 
+            // ALL of the unicode blocks found in this sample
+            // would improve speed but would be completely thrown off by an
+            // unexpected character, like an umlaut appearing in english text
+
+            $possible_langs = array_intersect(
+                        array_keys($this->_lang_db),
+                        array_unique($possible_langs)
+            );
+
+            // needs to intersect it with the keys of _lang_db in case 
+            // languages have been omitted
+
+        // or just try 'em all
+        } else {
+            $possible_langs = array_keys($this->_lang_db);
+        }
+
+
+        foreach ($possible_langs as $lang) {
             $scores[$lang] =
                 $this->_normalize_score(
-                    $this->_distance($lang_arr, $trigram_freqs),
-                    $trigram_count);
-
+                        $this->_distance($this->_lang_db[$lang], $trigram_freqs),
+                        $trigram_count);
         }
+
+        unset($sample_obj);
 
         if ($this->_perl_compatible) {
             asort($scores);
@@ -792,6 +878,168 @@ class Text_LanguageDetect
     }
 
     /**
+     * Returns the distribution of unicode blocks in a given utf8 string
+     *
+     * For the block name of a single char, use unicodeBlockName()
+     * 
+     * @access public
+     * @param string $str input string. Must be ascii or utf8
+     * @param bool $skip_symbols if true, skip ascii digits, symbols and 
+     *                           non-printing characters. Includes spaces,
+     *                           newlines and common punctutation characters.
+     * @return array
+     * @throws PEAR_Error
+     */
+    function detectUnicodeBlocks($str, $skip_symbols)
+    {
+        // input check
+        if (!is_bool($skip_symbols)) {
+            return PEAR::raiseError('Second parameter must be boolean');
+        } 
+
+        if (!is_string($str)) {
+            return PEAR::raiseError('First parameter was not a string');
+        }
+
+        $sample_obj = new Text_LanguageDetect_Parser($str);
+        $sample_obj->prepareUnicode();
+        $sample_obj->prepareTrigram(false);
+        $sample_obj->setUnicodeSkipSymbols($skip_symbols);
+        $sample_obj->analyze();
+        $blocks =& $sample_obj->getUnicodeBlocks();
+        unset($sample_obj);
+        return $blocks;
+    }
+
+    /**
+     * Returns the block name for a given unicode value
+     *
+     * If passed a string, will assume it is being passed a UTF8-formatted 
+     * character and will automatically convert. Otherwise it will assume it
+     * is being passed a numeric unicode value.
+     *
+     * Make sure input is of the correct type!
+     *
+     * @access public
+     * @param mixed $unicode unicode value or utf8 char
+     * @return mixed the block name string or false if not found
+     * @throws PEAR_Error
+     */
+    function unicodeBlockName($unicode) {
+        if (is_string($unicode)) {
+            // assume it is being passed a utf8 char, so convert it
+
+            // input check
+            if ($this->utf8strlen($unicode) > 1) {
+                return PEAR::raiseError('Pass this function only a single char');
+            }
+
+            $unicode = $this->_utf8char2unicode($unicode);
+
+            if ($unicode == -1) {
+                return PEAR::raiseError('Malformatted char');
+            }
+
+        // input check
+        } elseif (!is_int($unicode)) {
+            return PEAR::raiseError('Input must be of type string or int.');
+        }
+
+        $blocks =& $this->_read_unicode_block_db();
+
+        // there might have been a setup error for the block database
+        if (PEAR::isError($blocks)) {
+            return $blocks;
+        }
+
+        $result = $this->_unicode_block_name($unicode, $blocks);
+
+        if ($result == -1) {
+            return false;
+        } else {
+            return $result[2];
+        }
+    }
+
+    /**
+     * Searches the unicode block database
+     *
+     * Returns the block name for a given unicode value. unicodeBlockName() is
+     * the public interface for this function, which does input checks which
+     * this function omits for speed.
+     *
+     * @access  protected
+     * @param   int     $unicode the unicode value
+     * @param   array   &$blocks the block database
+     * @param   int     $block_count the number of defined blocks in the database
+     * @see     unicodeBlockName()
+     */
+    function _unicode_block_name($unicode, &$blocks, $block_count = -1) {
+        // for a reference, see 
+        // http://www.unicode.org/Public/UNIDATA/Blocks.txt
+
+        // assume that ascii characters are the most common
+        // so try it first for efficiency
+        if ($unicode <= $blocks[0][1]) {
+            return $blocks[0];
+        }
+
+        // the optional $block_count param is for efficiency
+        // so we this function doesn't have to run count() every time
+        if ($block_count != -1) {
+            $high = $block_count - 1;
+        } else {
+            $high = count($blocks) - 1;
+        }
+
+        $low = 1; // start with 1 because ascii was 0
+
+        // your average binary search algorithm
+        while ($low <= $high) {
+            $mid = floor(($low + $high) / 2);
+
+            // if it's lower than the lower bound
+            if ($unicode < $blocks[$mid][0]) {
+                $high = $mid - 1;
+
+            // if it's higher than the upper bound
+            } elseif ($unicode > $blocks[$mid][1]) {
+                $low = $mid + 1;
+
+            // found it
+            } else {
+                return $blocks[$mid];
+            }
+        }
+
+        // failed to find the block 
+        return -1;
+
+        // todo: differentiate when it's out of range or when it falls 
+        //       into an unassigned range?
+    }
+
+    /**
+     * Brings up the unicode block database
+     *
+     * @access protected
+     * @return array the database of unicode block definitions
+     * @throws PEAR_Error
+     */
+    function &_read_unicode_block_db() {
+        // since the unicode definitions are always going to be the same,
+        // might as well share the memory for the db with all other instances
+        // of this class
+        static $data;
+
+        if (!isset($data)) {
+            $data = $this->_readdb($this->_unicode_db_filename);
+        }
+
+        return $data;
+    }
+
+    /**
      * Calculate the similarities between the language models
      * 
      * Use this function to see how similar languages are to each other.
@@ -904,10 +1152,12 @@ class Text_LanguageDetect
      * Uses a nearest neighbor technique to generate the maximum possible
      * number of dendograms from the similarity data.
      *
-     * @access  public
-     * @return  array language cluster data
-     * @throws  PEAR_Error
-     * @see     languageSimilarity()
+     * @access      public
+     * @return      array language cluster data
+     * @throws      PEAR_Error
+     * @see         languageSimilarity()
+     * @deprecated  this function will eventually be removed and placed into 
+     *              the model generation class
      */
     function clusterLanguages()
     {
@@ -1100,6 +1350,11 @@ class Text_LanguageDetect
     function clusteredSearch($str)
     {
 
+        // input check
+        if (!Text_LanguageDetect_Parser::validateString($str)) {
+            return array();
+        }
+
         // clusterLanguages() will return a cached result if possible
         // so it's safe to call it every time
         $result = $this->clusterLanguages();
@@ -1111,9 +1366,12 @@ class Text_LanguageDetect
         $dendogram_start = $result['open_forks'];
         $dendogram_data  = $result['fork_data'];
         $dendogram_alias = $result['name_map'];
-        
 
-        $sample_result = $this->_arr_rank($this->_trigram($str));
+        $sample_obj = new Text_LanguageDetect_Parser($str);
+        $sample_obj->prepareTrigram();
+        $sample_obj->setPadStart(!$this->_perl_compatible);
+        $sample_obj->analyze();
+        $sample_result = $sample_obj->getTrigramRanks();
         $sample_count  = count($sample_result);
 
         // input check
@@ -1207,6 +1465,79 @@ class Text_LanguageDetect
         }
 
         return $scores;
+    }
+
+    /**
+     * ut8-safe strlen()
+     *
+     * Returns the numbers of characters (not bytes) in a utf8 string
+     *
+     * @static
+     * @access  public
+     * @param   string $str string to get the length of
+     * @return  int         number of chars
+     */
+    function utf8strlen($str)
+    {
+        // utf8_decode() will convert unknown chars to '?', which is actually
+        // ideal for counting.
+
+        return strlen(utf8_decode($str));
+
+        // idea stolen from dokuwiki
+    }
+
+    /**
+     * Returns the unicode value of a utf8 char
+     *
+     * @access  protected
+     * @param   string $char a utf8 (possibly multi-byte) char
+     * @return  int          unicode value or -1 if malformatted
+     */
+    function _utf8char2unicode($char) {
+
+        // strlen() here will actually get the binary length of a single char
+        switch (strlen($char)) {
+
+            // for a reference, see http://en.wikipedia.org/wiki/UTF-8
+
+            case 1:
+                // normal ASCII-7 byte
+                // 0xxxxxxx -->  0xxxxxxx
+                return ord($char{0});
+
+            case 2:
+                // 2 byte unicode
+                // 110zzzzx 10xxxxxx --> 00000zzz zxxxxxxx
+                $z = (ord($char{0}) & 0x000001F) << 6;
+                $x = (ord($char{1}) & 0x0000003F);
+
+                return ($z | $x);
+
+            case 3:
+                // 3 byte unicode
+                // 1110zzzz 10zxxxxx 10xxxxxx --> zzzzzxxx xxxxxxxx 
+                $z =  (ord($char{0}) & 0x0000000F) << 12;
+                $x1 = (ord($char{1}) & 0x0000003F) << 6;
+                $x2 = (ord($char{2}) & 0x0000003F);
+
+                return ($z | $x1 | $x2);
+
+            case 4:
+                // 4 byte unicode
+                // 11110zzz 10zzxxxx 10xxxxxx 10xxxxxx -->
+                // 000zzzzz xxxxxxxx xxxxxxxx
+                $z1 = (ord($char{0}) & 0x00000007) << 18;
+                $z2 = (ord($char{1}) & 0x0000003F) << 12;
+                $x1 = (ord($char{2}) & 0x0000003F) << 6;
+                $x2 = (ord($char{3}) & 0x0000003F);
+
+                return ($z1 | $z2 | $x1 | $x2);
+
+            default:
+                // error: malformatted char?
+                return -1;
+        }
     }
 
     /**
@@ -1304,7 +1635,7 @@ class Text_LanguageDetect
             // error?
         }
     }
-    
+
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
