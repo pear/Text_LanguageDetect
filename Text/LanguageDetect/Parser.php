@@ -8,7 +8,7 @@
  * @author      Nicholas Pisarro
  * @copyright   2006
  * @license     BSD
- * @version     CVS: $ID$
+ * @version     CVS: $Id$
  * @link        http://pear.php.net/package/Text_LanguageDetect/
  * @link        http://langdetect.blogspot.com/
  */
