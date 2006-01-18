@@ -60,7 +60,7 @@ if (isset($q) && strlen($q)) {
     $result = $l->detectUnicodeBlocks($q, false);
     if (!empty($result)) {
         arsort($result);
-        echo "Unicode blocks present: ", join(',', array_keys($result)), "\n<br /><br />";
+        echo "Unicode blocks present: ", join(', ', array_keys($result)), "\n<br /><br />";
     }
 }
 
