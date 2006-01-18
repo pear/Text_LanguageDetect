@@ -229,6 +229,8 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
             } else {
                 $block_count = count($blocks);
             }
+
+            $skipped_count = 0;
         }
 
         // trigram startup
@@ -288,43 +290,37 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
                     continue;
                 }
 
-                $unicode = $this->_utf8char2unicode($char);
-
-                // since we're usually going to be seeing the same thing,          
-                // check the last one found first                                  
-                if (isset($last_block) 
-                        && $unicode >= $last_block[0] 
-                        && $unicode <= $last_block[1]) {
-
-                    $this->_unicode_blocks[$last_block[2]]++;
-
-                // if not the same as the last, search the whole block db
+                // build an array of all the characters
+                if (isset($unicode_chars[$char])) {
+                    $unicode_chars[$char]++;
                 } else {
-                    $search_result = $this->_unicode_block_name($unicode, $blocks, $block_count);
-
-                    // if non-error result
-                    if ($search_result != -1) {
-                        if (!isset($this->_unicode_blocks[$search_result[2]])) {
-                            $this->_unicode_blocks[$search_result[2]] = 1;
-                        } else {
-                            $this->_unicode_blocks[$search_result[2]]++;
-                        }
-
-                        $last_block = $search_result;
-
-                    // if error result
-                    } else {
-                        if (!isset($this->_unicode_blocks['[Malformatted]'])) {
-                            $this->_unicode_blocks['[Malformatted]'] = 1;
-                        } else {
-                            $this->_unicode_blocks['[Malformatted]']++;
-                        }
-                    }
+                    $unicode_chars[$char] = 1;
                 }
             }
 
             // todo: add byte detection here
         }
+
+        // unicode cleanup
+        if ($this->_compile_unicode) {
+            foreach ($unicode_chars as $utf8_char => $count) {
+                $search_result = $this->_unicode_block_name(
+                        $this->_utf8char2unicode($utf8_char), $blocks, $block_count);
+
+                if ($search_result != -1) {
+                    $block_name = $search_result[2];
+                } else {
+                    $block_name = '[Malformatted]';
+                }
+
+                if (isset($this->_unicode_blocks[$block_name])) {
+                    $this->_unicode_blocks[$block_name] += $count;
+                } else {
+                    $this->_unicode_blocks[$block_name] = $count;
+                }
+            }
+        }
+
 
         // trigram cleanup
         if ($this->_compile_trigram) {
