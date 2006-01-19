@@ -1596,6 +1596,27 @@ EOF;
         }
     }
 
+    function test_unicode_off()
+    {
+
+        // see what happens when you turn the unicode setting off
+
+        $myobj = new Text_LanguageDetect;
+
+        $str = 'This is a delightful sample of English text';
+
+        $myobj->useUnicodeBlocks(true);
+        $result1 = $myobj->detectConfidence($str);
+
+        $myobj->useUnicodeBlocks(false);
+        $result2 = $myobj->detectConfidence($str);
+
+        $this->assertEquals($result1, $result2);
+        
+        // note this test doesn't tell if unicode narrowing was actually used or not
+    }
+
+
     function test_detection()
     {
 
