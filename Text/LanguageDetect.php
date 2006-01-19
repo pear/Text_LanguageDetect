@@ -158,8 +158,6 @@ class Text_LanguageDetect
     /**
      * Whether to use the unicode block detection to speed up processing
      *
-     * This is a stub flag; there is no accessor function to turn it on or off
-     *
      * @access private
      * @var bool
      */
@@ -448,6 +446,24 @@ class Text_LanguageDetect
             }
         }
 
+    }
+
+    /**
+     * Whether to use unicode block ranges in detection
+     *
+     * Should speed up most detections if turned on (detault is on). In some
+     * circumstances it may be slower, such as for large text samples (> 10K)
+     * in languages that use latin scripts. In other cases it should speed up
+     * detection noticeably.
+     *
+     * @access  public
+     * @param   bool    $setting    false to turn off
+     */
+    function useUnicodeBlocks($setting = true)
+    {
+        if (is_bool($setting)) {
+            $this->_use_unicode_narrowing = $setting;
+        }
     }
 
     /**
