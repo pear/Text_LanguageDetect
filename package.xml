@@ -2,7 +2,7 @@
 <!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
 <package version="1.0">
 
-    <!-- $Id: package.xml,v 1.6 2006-01-17 23:37:17 taak Exp $ -->
+    <!-- $Id: package.xml,v 1.7 2006-01-19 04:12:42 taak Exp $ -->
 
     <name>Text_LanguageDetect</name>
     <summary>Language detection class</summary>
@@ -19,13 +19,13 @@
 
     <release>
         <version>0.2.0</version>
-        <date>2006-01-17</date>
+        <date>2006-01-18</date>
         <license>BSD</license>
         <state>alpha</state>
         <notes>
             * Added unicode block range identification
             * unicode block ranges used to optimize language detection by pre-selecting which known language trigram profiles in the database to attempt comparison with
-            * Added several utf8 utility functions
+            * Added several utf8/unicode utility functions
             * new Parser class for building data profiles from text samples
             * Fix: mb_convert_encoding() now used correctly
             * Fix: basic case-folding for Cyrillic alphabet implemented
@@ -37,7 +37,7 @@
                 <replace from="@data_dir@" to="data_dir" type="pear-config" />
             </file>
             
-			<dir role="php" name="Text/LanguageDetect">
+            <dir role="php" name="Text/LanguageDetect">
                 <file role="php" name="Parser.php">
                     <replace from="@package_version@" to="version" type="package-info" />
                 </file>
@@ -60,13 +60,13 @@
     <changelog>
         <release>
             <version>0.2.0</version>
-            <date>2006-01-17</date>
+            <date>2006-01-18</date>
             <license>BSD</license>
             <state>alpha</state>
             <notes>
                 * Added unicode block range identification
                 * unicode block ranges used to optimize language detection by pre-selecting which known language trigram profiles in the database to attempt comparison with
-                * Added several utf8 utility functions
+                * Added several utf8/unicode utility functions
                 * new Parser class for building data profiles from text samples
                 * Fix: mb_convert_encoding() now used correctly
                 * Fix: basic case-folding for Cyrillic alphabet implemented
