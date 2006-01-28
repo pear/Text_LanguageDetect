@@ -277,7 +277,11 @@ class Text_LanguageDetect
             return false;
 
         } elseif (!is_array($this->_lang_db)) {
-            $err = PEAR::raiseError('Language database is not an array.');
+            if (ini_get('magic_quotes_runtime')) {
+                $err = PEAR::raiseError('Error loading database. Try turning magic_quotes_runtime off.');
+            } else {
+                $err = PEAR::raiseError('Language database is not an array.');
+            }
             return false;
 
         } elseif (empty($this->_lang_db)) {
