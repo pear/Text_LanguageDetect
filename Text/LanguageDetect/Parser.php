@@ -231,6 +231,7 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
             }
 
             $skipped_count = 0;
+            $unicode_chars = array();
         }
 
         // trigram startup
@@ -343,7 +344,11 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
                 }
             }
 
-            $this->_trigram_ranks = $this->_arr_rank($this->_trigram);
+            if (!empty($this->_trigram)) {
+                $this->_trigram_ranks = $this->_arr_rank($this->_trigram);
+            } else {
+                $this->_trigram_ranks = array();
+            }
         }
     }
 }
