@@ -1455,14 +1455,20 @@ class langtest extends PHPUnit_TestCase {
 
         $i = 0;
         $j = 0;
+        $new_u = '';
         while ($i < strlen($uppercased)) {
             $u = Text_LanguageDetect::_next_char($uppercased, $i, true);
             $l = Text_LanguageDetect::_next_char($lowercased, $j, true);
             $this->assertEquals($u, $l);
+
+            $new_u .= $u;
         }
 
         $this->assertEquals($i, $j);
         $this->assertEquals($i, strlen($lowercased));
+        if (function_exists('mb_strtolower')) {
+            $this->assertEquals($new_u, mb_strtolower($uppercased, 'UTF-8'));
+        }
     }
 
     function test_block_detection()
