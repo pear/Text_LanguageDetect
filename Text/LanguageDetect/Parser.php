@@ -224,7 +224,9 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
 
             if (PEAR::isError($blocks)) {
                 $this->_compile_unicode = false;
-                // todo: need reporting to the user
+
+                // will be returned to the user when getUnicodeBlocks() is called
+                $this->_unicode_blocks = $blocks;
 
             } else {
                 $block_count = count($blocks);
