@@ -30,6 +30,12 @@ while ($line = fgets($stdin)) {
     } else {
         print_r($result);
     }
+    $blocks = $l->detectUnicodeBlocks($line, true);
+    if (PEAR::isError($blocks)) {
+        echo $blocks->getMessage(), "\n";
+    } else {
+        print_r($blocks);
+    }
 }
 
 fclose($stdin);
