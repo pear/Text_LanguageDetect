@@ -7,6 +7,7 @@
 
 require_once '../Text/LanguageDetect.php';
 require_once 'PHPUnit.php';
+require_once 'Benchmark/Timer.php';
 
 class langtest extends PHPUnit_TestCase {
 
@@ -1740,9 +1741,14 @@ EOF;
 
 }
 
+$timer = new Benchmark_Timer();
+
+$timer->start();
 $suite = new PHPUnit_TestSuite('langtest');
 $result = PHPUnit::run($suite);
 echo $result->toString();
+$timer->stop();
+$timer->display();
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 encoding=utf-8: */
 
