@@ -22,7 +22,7 @@
  */
 
 require_once 'PEAR.php';
-require_once 'LanguageDetect/Parser.php';
+require_once 'Text/LanguageDetect/Parser.php';
 
 /**
  * Language detection class
