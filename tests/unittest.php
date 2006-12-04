@@ -5,7 +5,7 @@
  * @version CVS: $Id$
  */
 
-require_once '../Text/LanguageDetect.php';
+require_once 'Text/LanguageDetect.php';
 require_once 'PHPUnit.php';
 require_once 'Benchmark/Timer.php';
 
