@@ -694,9 +694,29 @@ class Text_LanguageDetect
         if (function_exists('mb_detect_encoding') 
             && function_exists('mb_convert_encoding')) {
 
+            // mb_detect_encoding isn't very reliable, to say the least
+            // detection should still work with a sufficient sample of ascii characters
             $encoding = mb_detect_encoding($sample);
-            if ($encoding != 'ASCII' && $encoding != 'UTF-8') {
-                $sample = mb_convert_encoding($sample, 'UTF-8', $encoding);
+
+            // mb_detect_encoding() will return FALSE if detection fails
+            // don't attempt conversion if that's the case
+            if ($encoding != 'ASCII' && $encoding != 'UTF-8' && $encoding !== false) {
+            
+                if (function_exists('mb_list_encodings')) {
+ 
+                    // verify the encoding exists in mb_list_encodings
+                    if (in_array($encoding, mb_list_encodings())) {
+                        $sample = mb_convert_encoding($sample, 'UTF-8', $encoding);
+                    }
+
+                    // if the previous condition failed:
+                    // somehow we detected an encoding that also we don't support
+
+                } else {
+                    // php 4 doesnt have mb_list_encodings()
+                    // so attempt with error suppression
+                    $sample = @mb_convert_encoding($sample, 'UTF-8', $encoding);
+                }
             }
         }
 
