@@ -2,7 +2,7 @@
 <!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
 <package version="1.0">
 
-    <!-- $Id: package.xml,v 1.8 2006-12-04 01:22:02 taak Exp $ -->
+    <!-- $Id: package.xml,v 1.9 2008-07-30 03:06:42 taak Exp $ -->
 
     <name>Text_LanguageDetect</name>
     <summary>Language detection class</summary>
@@ -18,14 +18,12 @@
     </maintainers>
 
     <release>
-        <version>0.2.1</version>
-        <date>2006-12-03</date>
+        <version>0.2.2</version>
+        <date>2008-07-30</date>
         <license>BSD</license>
         <state>alpha</state>
         <notes>
-            * Fix: Now uses conventionalized include path
-            * Fix: Won't cause error if input is purely symbol-range characters
-            * Better error reporting if error in unicode db loading
+		* Fix Bug #13385	
         </notes>
 
         <filelist>
@@ -55,6 +53,15 @@
     </release>
 
     <changelog>
+        <release>
+		<version>0.2.2</version>
+		<date>2008-07-31</date>
+		<license>BSD</license>
+		<state>alpha</state>
+		<notes>
+			* Fixed Bug #13385	
+		</notes>
+	</release>
         <release>
             <version>0.2.1</version>
             <date>2006-12-03</date>
