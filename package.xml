@@ -2,7 +2,7 @@
 <!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
 <package version="1.0">
 
-    <!-- $Id: package.xml,v 1.9 2008-07-30 03:06:42 taak Exp $ -->
+    <!-- $Id: package.xml,v 1.10 2008-07-30 19:26:23 taak Exp $ -->
 
     <name>Text_LanguageDetect</name>
     <summary>Language detection class</summary>
@@ -12,18 +12,18 @@
         <maintainer>
             <user>taak</user>
             <name>Nicholas Pisarro</name>
-            <email>infinityminusnine+pear@gmail.com</email>
+            <email>taak@php.net</email>
             <role>lead</role>
         </maintainer>
     </maintainers>
 
     <release>
-        <version>0.2.2</version>
+        <version>0.2.3</version>
         <date>2008-07-30</date>
         <license>BSD</license>
         <state>alpha</state>
         <notes>
-		* Fix Bug #13385	
+            Updated package requirements
         </notes>
 
         <filelist>
@@ -46,7 +46,8 @@
         </filelist>
 
         <deps>
-            <dep type="php" rel="ge" version="4.0.3" />
+            <dep type="php" rel="ge" version="4.3" />
+            <dep type="ext" rel="has" optional="no">pcre</dep>
             <dep type="ext" rel="has" optional="yes">mbstring</dep>
         </deps>
 
@@ -54,14 +55,23 @@
 
     <changelog>
         <release>
-		<version>0.2.2</version>
-		<date>2008-07-31</date>
-		<license>BSD</license>
-		<state>alpha</state>
-		<notes>
-			* Fixed Bug #13385	
-		</notes>
-	</release>
+            <version>0.2.3</version>
+            <date>2008-07-30</date>
+            <license>BSD</license>
+            <state>alpha</state>
+            <notes>
+                updated package requirements
+            </notes>
+        </release>
+        <release>
+            <version>0.2.2</version>
+            <date>2008-07-30</date>
+            <license>BSD</license>
+            <state>alpha</state>
+            <notes>
+                * Fixed Bug #13385    
+            </notes>
+        </release>
         <release>
             <version>0.2.1</version>
             <date>2006-12-03</date>

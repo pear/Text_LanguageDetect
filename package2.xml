@@ -11,21 +11,21 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <lead>
   <name>Nicholas Pisarro</name>
   <user>taak</user>
-  <email>infinityminusnine+pear@gmail.com</email>
+  <email>taak@php.net</email>
   <active>yes</active>
  </lead>
- <date>2008-07-29</date>
- <time>23:03:28</time>
+ <date>2008-07-30</date>
+ <time>15:25:25</time>
  <version>
-  <release>0.2.2</release>
-  <api>0.2.2</api>
+  <release>0.2.3</release>
+  <api>0.2.3</api>
  </version>
  <stability>
   <release>alpha</release>
   <api>alpha</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
- <notes>* Fix Bug #13385	
+ <notes>Updated package requirements
  </notes>
  <contents>
   <dir name="/">
@@ -56,11 +56,14 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <dependencies>
   <required>
    <php>
-    <min>4.0.3</min>
+    <min>4.3</min>
    </php>
    <pearinstaller>
     <min>1.4.0b1</min>
    </pearinstaller>
+   <extension>
+    <name>pcre</name>
+   </extension>
   </required>
   <optional>
    <extension>
@@ -77,6 +80,20 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <changelog>
   <release>
    <version>
+    <release>0.2.3</release>
+    <api>0.2.3</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2008-07-30</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>updated package requirements
+   </notes>
+  </release>
+  <release>
+   <version>
     <release>0.2.2</release>
     <api>0.2.2</api>
    </version>
@@ -86,7 +103,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
    </stability>
    <date>2008-07-30</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
-   <notes>* Fixed Bug #13385	
+   <notes>* Fixed Bug #13385    
    </notes>
   </release>
   <release>
