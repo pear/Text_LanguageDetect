@@ -6,8 +6,7 @@
  */
 
 require_once 'Text/LanguageDetect.php';
-require_once 'PHPUnit.php';
-require_once 'Benchmark/Timer.php';
+require_once 'PHPUnit/Framework/TestCase.php';
 
 class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
@@ -16,7 +15,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->x = new Text_LanguageDetect;
 
         if (!$this->x->_setup_ok($err)) {
-            die($err->getMessage());
+            $this->markTestSkipped($err->getMessage());
         }
     }
 
@@ -1735,16 +1734,3 @@ EOF;
     }
 
 }
-
-$timer = new Benchmark_Timer();
-
-$timer->start();
-$suite = new PHPUnit_TestSuite('langtest');
-$result = PHPUnit::run($suite);
-echo $result->toString();
-$timer->stop();
-$timer->display();
-
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 encoding=utf-8: */
-
-?>
