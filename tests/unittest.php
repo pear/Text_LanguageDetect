@@ -9,12 +9,7 @@ require_once 'Text/LanguageDetect.php';
 require_once 'PHPUnit.php';
 require_once 'Benchmark/Timer.php';
 
-class langtest extends PHPUnit_TestCase {
-
-    function langtest ($name)
-    {
-        $this->PHPUnit_TestCase($name);
-    }
+class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
     function setup ()
     {
