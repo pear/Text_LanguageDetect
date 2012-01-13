@@ -8,25 +8,33 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <summary>Language detection class</summary>
  <description>Text_LanguageDetect can identify 52 human languages from text samples and return confidence scores for each.
  </description>
+
  <lead>
   <name>Nicholas Pisarro</name>
   <user>taak</user>
   <email>taak@php.net</email>
-  <active>yes</active>
+  <active>no</active>
  </lead>
- <date>2008-07-30</date>
- <time>15:25:25</time>
+
+ <date>2012-01-13</date>
+ <time>21:22:23</time>
  <version>
-  <release>0.2.3</release>
+  <release>0.3.0</release>
   <api>0.2.3</api>
  </version>
+
  <stability>
   <release>alpha</release>
   <api>alpha</api>
  </stability>
+
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
- <notes>Updated package requirements
+
+ <notes>
+- BC break: Return lowercase language names
+- Implement request #19221: Return ISO 639-1 or ISO 639-2 language codes
  </notes>
+
  <contents>
   <dir name="/">
    <dir name="data">
@@ -36,13 +44,18 @@ http://pear.php.net/dtd/package-2.0.xsd">
    <dir name="docs">
     <file name="example_clui.php" role="doc" />
     <file name="example_web.php" role="doc" />
+    <file name="iso.php" role="doc" />
    </dir> <!-- /docs -->
    <dir name="tests">
-    <file name="unittest.php" role="test" />
+    <file name="Text_LanguageDetectTest.php" role="test" />
+    <file name="Text_LanguageDetect_ISO639Test.php" role="test" />
    </dir> <!-- /tests -->
    <dir name="Text">
     <dir name="LanguageDetect">
      <file name="Parser.php" role="php">
+      <tasks:replace from="@package_version@" to="version" type="package-info" />
+     </file>
+     <file name="ISO639.php" role="php">
       <tasks:replace from="@package_version@" to="version" type="package-info" />
      </file>
     </dir> <!-- /Text/LanguageDetect -->
@@ -53,13 +66,14 @@ http://pear.php.net/dtd/package-2.0.xsd">
    </dir> <!-- /Text -->
   </dir> <!-- / -->
  </contents>
+
  <dependencies>
   <required>
    <php>
-    <min>4.3</min>
+    <min>5.3</min>
    </php>
    <pearinstaller>
-    <min>1.4.0b1</min>
+    <min>1.9.0</min>
    </pearinstaller>
    <extension>
     <name>pcre</name>
@@ -71,12 +85,14 @@ http://pear.php.net/dtd/package-2.0.xsd">
    </extension>
   </optional>
  </dependencies>
+
  <phprelease>
   <filelist>
    <install as="lang.dat" name="data/lang.dat" />
    <install as="unicode_blocks.dat" name="data/unicode_blocks.dat" />
   </filelist>
  </phprelease>
+
  <changelog>
   <release>
    <version>
@@ -92,6 +108,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
    <notes>updated package requirements
    </notes>
   </release>
+
   <release>
    <version>
     <release>0.2.2</release>
@@ -106,6 +123,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
    <notes>* Fixed Bug #13385    
    </notes>
   </release>
+
   <release>
    <version>
     <release>0.2.1</release>
@@ -122,6 +140,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
 * Better error reporting if error in unicode db loading
    </notes>
   </release>
+
   <release>
    <version>
     <release>0.2.0</release>
@@ -141,6 +160,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
 * Fix: basic case-folding for Cyrillic alphabet implemented
    </notes>
   </release>
+
   <release>
    <version>
     <release>0.1.1</release>
@@ -159,6 +179,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
 * Slight speed improvement to utf8 iterator
    </notes>
   </release>
+
   <release>
    <version>
     <release>0.1.0</release>
