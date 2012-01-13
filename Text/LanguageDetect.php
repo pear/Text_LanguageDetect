@@ -23,6 +23,7 @@
 
 require_once 'PEAR.php';
 require_once 'Text/LanguageDetect/Parser.php';
+require_once 'Text/LanguageDetect/ISO639.php';
 
 /**
  * Language detection class
@@ -173,6 +174,15 @@ class Text_LanguageDetect
     var $_clusters;
 
     /**
+     * Which type of "language names" are accepted and returned:
+     *
+     * 0 - language name ("english")
+     * 2 - 2-letter ISO 639-1 code ("en")
+     * 3 - 3-letter ISO 639-2 code ("eng")
+     */
+    var $_name_mode = 0;
+
+    /**
      * Constructor
      *
      * Will attempt to load the language database. If it fails, you will get
@@ -319,6 +329,8 @@ class Text_LanguageDetect
 
         $deleted = 0;
 
+        $omit_list = $this->_convertFromNameMode($omit_list);
+
         // deleting the given languages
         if (!$include_only) {
             if (!is_array($omit_list)) {
@@ -396,6 +408,7 @@ class Text_LanguageDetect
         if (!$this->_setup_ok($err)) {
             return $err;
         } else {
+            $lang = $this->_convertFromNameMode($lang);
             // string
             if (is_string($lang)) {
                 return isset($this->_lang_db[strtolower($lang)]);
@@ -428,7 +441,9 @@ class Text_LanguageDetect
         if (!$this->_setup_ok($err)) {
             return $err;
         } else {
-            return array_keys($this->_lang_db);
+            return $this->_convertToNameMode(
+                array_keys($this->_lang_db)
+            );
         }
     }
 
@@ -450,6 +465,21 @@ class Text_LanguageDetect
             }
         }
 
+    }
+
+    /**
+     * Sets the way how language names are accepted and returned.
+     *
+     * @param integer $name_mode One of the following modes:
+     *                           0 - language name ("english")
+     *                           2 - 2-letter ISO 639-1 code ("en")
+     *                           3 - 3-letter ISO 639-2 code ("eng")
+     *
+     * @return void
+     */
+    function setNameMode($name_mode)
+    {
+        $this->_name_mode = $name_mode;
     }
 
     /**
@@ -812,9 +842,9 @@ class Text_LanguageDetect
                 $limited_scores[$key] = $value;
             }
 
-            return $limited_scores;
+            return $this->_convertToNameMode($limited_scores, true);
         } else {
-            return $scores;
+            return $this->_convertToNameMode($scores, true);
         }
     }
 
@@ -847,7 +877,7 @@ class Text_LanguageDetect
             return null;
 
         } else {
-            return ucfirst(key($scores));
+            return key($scores);
         }
     }
 
@@ -893,7 +923,7 @@ class Text_LanguageDetect
             return null;
         }
 
-        $arr['language'] = ucfirst(key($scores));
+        $arr['language'] = key($scores);
         $arr['similarity'] = current($scores);
         if (next($scores) !== false) { // if false then no next element
             // the goal is to return a higher value if the distance between
@@ -1104,6 +1134,8 @@ class Text_LanguageDetect
             return $err;
         }
 
+        $lang1 = $this->_convertFromNameMode($lang1);
+        $lang2 = $this->_convertFromNameMode($lang2);
         if ($lang1 != null) {
             $lang1 = strtolower($lang1);
 
@@ -1660,7 +1692,6 @@ class Text_LanguageDetect
 
             // tag on next byte
             return $char . $nextchar; 
-
         } elseif ($ord >> 4  == 14) { // three-byte char
             
             // tag on next 2 bytes
@@ -1676,6 +1707,85 @@ class Text_LanguageDetect
         }
     }
 
+    /**
+     * Converts an $language input parameter from the configured mode
+     * to the language name that is used internally.
+     *
+     * Works for strings and arrays.
+     *
+     * @param string|array $lang        A language description ("english"/"en"/"eng")
+     * @param boolean      $convertKey  If $lang is an array, setting $key
+     *                                  converts the keys to the language name.
+     *
+     * @return string|array Language name
+     */
+    function _convertFromNameMode($lang, $convertKey = false)
+    {
+        if ($this->_name_mode == 0) {
+            return $lang;
+        }
+
+        if ($this->_name_mode == 2) {
+            $method = 'code2ToName';
+        } else {
+            $method = 'code3ToName';
+        }
+
+        if (is_string($lang)) {
+            return (string)Text_LanguageDetect_ISO639::$method($lang);
+        }
+
+        $newlang = array();
+        foreach ($lang as $key => $val) {
+            if ($convertKey) {
+                $newkey = (string)Text_LanguageDetect_ISO639::$method($key);
+                $newlang[$newkey] = $val;
+            } else {
+                $newlang[$key] = (string)Text_LanguageDetect_ISO639::$method($val);
+            }
+        }
+        return $newlang;
+    }
+
+    /**
+     * Converts an $language output parameter from the language name that is
+     * used internally to the configured mode.
+     *
+     * Works for strings and arrays.
+     *
+     * @param string|array $lang        A language description ("english"/"en"/"eng")
+     * @param boolean      $convertKey  If $lang is an array, setting $key
+     *                                  converts the keys to the language name.
+     *
+     * @return string|array Language name
+     */
+    function _convertToNameMode($lang, $convertKey = false)
+    {
+        if ($this->_name_mode == 0) {
+            return $lang;
+        }
+
+        if ($this->_name_mode == 2) {
+            $method = 'nameToCode2';
+        } else {
+            $method = 'nameToCode3';
+        }
+
+        if (is_string($lang)) {
+            return Text_LanguageDetect_ISO639::$method($lang);
+        }
+
+        $newlang = array();
+        foreach ($lang as $key => $val) {
+            if ($convertKey) {
+                $newkey = Text_LanguageDetect_ISO639::$method($key);
+                $newlang[$newkey] = $val;
+            } else {
+                $newlang[$key] = Text_LanguageDetect_ISO639::$method($val);
+            }
+        }
+        return $newlang;
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */

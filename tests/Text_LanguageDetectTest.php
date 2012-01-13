@@ -157,6 +157,12 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         unset($myobj);
     }
 
+    function test_omitNameMode2()
+    {
+        $this->x->setNameMode(2);
+        $this->assertEquals(1, $this->x->omitLanguages('en'));
+    }
+
     function test_perl_compatibility()
     {
         // if this test fails, then many of the others will
@@ -341,7 +347,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(isset($result['language']), 'language');
         $this->assertTrue(isset($result['similarity']), 'similarity');
         $this->assertTrue(isset($result['confidence']), 'confidence');
-        $this->assertEquals('English', $result['language']);
+        $this->assertEquals('english', $result['language']);
         $this->assertTrue($result['similarity'] <= 300 && $result['similarity'] >= 0, $result['similarity']);
         $this->assertTrue($result['confidence'] <= 1 && $result['confidence'] >= 0, $result['confidence']);
 
@@ -1322,7 +1328,77 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         }
     }
 
-    function test_language_compare ()
+    function testLanguageExistsNameMode2()
+    {
+        $this->x->setNameMode(2);
+        $this->assertTrue($this->x->languageExists('en'));
+        $this->assertFalse($this->x->languageExists('english'));
+    }
+
+    function testLanguageExistsArrayNameMode2()
+    {
+        $this->x->setNameMode(2);
+        $this->assertTrue($this->x->languageExists(array('en', 'de')));
+        $this->assertFalse($this->x->languageExists(array('en', 'doesnotexist')));
+    }
+
+    function testGetLanguages()
+    {
+        $langs = $this->x->getLanguages();
+        $this->assertContains('english', $langs);
+        $this->assertContains('swedish', $langs);
+    }
+
+    function testGetLanguagesNameMode2()
+    {
+        $this->x->setNameMode(2);
+        $langs = $this->x->getLanguages();
+        $this->assertContains('en', $langs);
+        $this->assertContains('sv', $langs);
+    }
+
+    function testDetect()
+    {
+        $scores = $this->x->detect('Das ist ein kleiner Text für euch alle');
+        $this->assertInternalType('array', $scores);
+        $this->assertGreaterThan(5, count($scores));
+
+        list($key, $value) = each($scores);
+        $this->assertEquals('german', $key, 'text is german');
+    }
+
+    function testDetectNameMode2()
+    {
+        $this->x->setNameMode(2);
+        $scores = $this->x->detect('Das ist ein kleiner Text für euch alle');
+        list($key, $value) = each($scores);
+        $this->assertEquals('de', $key, 'text is german');
+    }
+
+    function testDetectNameMode2Limit()
+    {
+        $this->x->setNameMode(2);
+        $scores = $this->x->detect('Das ist ein kleiner Text für euch alle', 1);
+        list($key, $value) = each($scores);
+        $this->assertEquals('de', $key, 'text is german');
+    }
+
+    function testDetectSimple()
+    {
+        $lang = $this->x->detectSimple('Das ist ein kleiner Text für euch alle');
+        $this->assertInternalType('string', $lang);
+        $this->assertEquals('german', $lang, 'text is german');
+    }
+
+    function testDetectSimpleNameMode2()
+    {
+        $this->x->setNameMode(2);
+        $lang = $this->x->detectSimple('Das ist ein kleiner Text für euch alle');
+        $this->assertInternalType('string', $lang);
+        $this->assertEquals('de', $lang, 'text is german');
+    }
+
+    function testLanguageSimilarity()
     {
         $this->x->setPerlCompatible(true);
         $eng_dan = $this->x->languageSimilarity('english', 'danish');
@@ -1370,6 +1446,17 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     }
 
 
+    function testLanguageSimilarityNameMode2()
+    {
+        $this->x->setNameMode(2);
+        $this->x->setPerlCompatible(true);
+        $eng_dan = $this->x->languageSimilarity('en', 'dk');
+        $nor_dan = $this->x->languageSimilarity('no', 'dk');
+
+        // remember, lower means more similar
+        $this->assertTrue($eng_dan > $nor_dan); // english is less similar to danish than norwegian is
+    }
+
     function test_compatibility ()
     {
         $str = "I am the very model of a modern major general.";
@@ -1381,7 +1468,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(!is_null($result));
         $this->assertTrue(is_array($result));
         extract($result);
-        $this->assertEquals('English', $language);
+        $this->assertEquals('english', $language);
         $this->assertTrue($similarity <= 1 && $similarity >= 0, $similarity);
         $this->assertTrue($confidence <= 1 && $confidence >= 0, $confidence);
 
@@ -1389,7 +1476,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $result = $this->x->detectConfidence($str);
         extract($result, EXTR_OVERWRITE);
     
-        $this->assertEquals('English', $language);
+        $this->assertEquals('english', $language);
 
         // technically the lowest possible score is 0 but it's extremely unlikely to hit that
         $this->assertTrue($similarity <= 300 && $similarity >= 1, $similarity);
@@ -1404,7 +1491,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $myobj = new Text_LanguageDetect;
 
         $result = $myobj->detectSimple($str);
-        $this->assertEquals('English', $result);
+        $this->assertEquals('english', $result);
 
         // omit all languages and you should get an error
         $myobj->omitLanguages($myobj->getLanguages());
@@ -1707,8 +1794,144 @@ EOF;
         }
 
         foreach ($testarr as $key=>$value) {
-            $this->assertEquals(ucfirst($key), $this->x->detectSimple($value));
+            $this->assertEquals($key, $this->x->detectSimple($value));
         }
     }
 
+
+    public function test_convertFromNameMode0()
+    {
+        $this->assertEquals(
+            'english',
+            $this->x->_convertFromNameMode('english')
+        );
+    }
+
+    public function test_convertFromNameMode2String()
+    {
+        $this->x->setNameMode(2);
+        $this->assertEquals(
+            'english',
+            $this->x->_convertFromNameMode('en')
+        );
+    }
+
+    public function test_convertFromNameMode3String()
+    {
+        $this->x->setNameMode(3);
+        $this->assertEquals(
+            'english',
+            $this->x->_convertFromNameMode('eng')
+        );
+    }
+
+    public function test_convertFromNameMode2ArrayVal()
+    {
+        $this->x->setNameMode(2);
+        $this->assertEquals(
+            array('english', 'german'),
+            $this->x->_convertFromNameMode(array('en', 'de'))
+        );
+    }
+
+    public function test_convertFromNameMode2ArrayKey()
+    {
+        $this->x->setNameMode(2);
+        $this->assertEquals(
+            array('english' => 'foo', 'german' => 'test'),
+            $this->x->_convertFromNameMode(
+                array('en' => 'foo', 'de' => 'test'),
+                true
+            )
+        );
+    }
+
+    public function test_convertFromNameMode3ArrayVal()
+    {
+        $this->x->setNameMode(3);
+        $this->assertEquals(
+            array('english', 'german'),
+            $this->x->_convertFromNameMode(array('eng', 'deu'))
+        );
+    }
+
+    public function test_convertFromNameMode3ArrayKey()
+    {
+        $this->x->setNameMode(3);
+        $this->assertEquals(
+            array('english' => 'foo', 'german' => 'test'),
+            $this->x->_convertFromNameMode(
+                array('eng' => 'foo', 'deu' => 'test'),
+                true
+            )
+        );
+    }
+
+    public function test_convertToNameMode0()
+    {
+        $this->assertEquals(
+            'english',
+            $this->x->_convertToNameMode('english')
+        );
+    }
+
+    public function test_convertToNameMode2String()
+    {
+        $this->x->setNameMode(2);
+        $this->assertEquals(
+            'en',
+            $this->x->_convertToNameMode('english')
+        );
+    }
+
+    public function test_convertToNameMode3String()
+    {
+        $this->x->setNameMode(3);
+        $this->assertEquals(
+            'eng',
+            $this->x->_convertToNameMode('english')
+        );
+    }
+
+    public function test_convertToNameMode2ArrayVal()
+    {
+        $this->x->setNameMode(2);
+        $this->assertEquals(
+            array('en', 'de'),
+            $this->x->_convertToNameMode(array('english', 'german'))
+        );
+    }
+
+    public function test_convertToNameMode2ArrayKey()
+    {
+        $this->x->setNameMode(2);
+        $this->assertEquals(
+            array('en' => 'foo', 'de' => 'test'),
+            $this->x->_convertToNameMode(
+                array('english' => 'foo', 'german' => 'test'),
+                true
+            )
+        );
+    }
+
+    public function test_convertToNameMode3ArrayVal()
+    {
+        $this->x->setNameMode(3);
+        $this->assertEquals(
+            array('eng', 'deu'),
+            $this->x->_convertToNameMode(array('english', 'german'))
+        );
+    }
+
+    public function test_convertToNameMode3ArrayKey()
+    {
+        $this->x->setNameMode(3);
+        $this->assertEquals(
+            array('eng' => 'foo', 'deu' => 'test'),
+            $this->x->_convertToNameMode(
+                array('english' => 'foo', 'german' => 'test'),
+                true
+            )
+        );
+    }
 }
