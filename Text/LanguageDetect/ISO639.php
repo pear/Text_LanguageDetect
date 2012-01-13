@@ -255,7 +255,7 @@ class Text_LanguageDetect_ISO639
         'pol' => 'polish',
         'por' => 'portuguese',
         'pus' => 'pashto',
-        'ron' => 'romanian',
+        'rom' => 'romanian',
         'rus' => 'russian',
         'slk' => 'slovak',
         'slv' => 'slovene',
@@ -299,10 +299,10 @@ class Text_LanguageDetect_ISO639
     public static function nameToCode3($lang)
     {
         $lang = strtolower($lang);
-        if (!isset(self::$nameToCode2[$lang])) {
+        if (!isset(self::$nameToCode3[$lang])) {
             return null;
         }
-        return self::$nameToCode2[$lang];
+        return self::$nameToCode3[$lang];
     }
 
     /**
@@ -314,11 +314,11 @@ class Text_LanguageDetect_ISO639
      */
     public static function code2ToName($code)
     {
-        $lang = strtolower($lang);
-        if (!isset(self::$code2ToName[$lang])) {
+        $lang = strtolower($code);
+        if (!isset(self::$code2ToName[$code])) {
             return null;
         }
-        return self::$code2ToName[$lang];
+        return self::$code2ToName[$code];
     }
 
     /**
@@ -330,11 +330,11 @@ class Text_LanguageDetect_ISO639
      */
     public static function code3ToName($code)
     {
-        $lang = strtolower($lang);
-        if (!isset(self::$code3ToName[$lang])) {
+        $lang = strtolower($code);
+        if (!isset(self::$code3ToName[$code])) {
             return null;
         }
-        return self::$code3ToName[$lang];
+        return self::$code3ToName[$code];
     }
 }
 
