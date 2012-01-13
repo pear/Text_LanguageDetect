@@ -4,6 +4,9 @@
  * @package Text_LanguageDetect
  * @version CVS: $Id$
  */
+set_include_path(
+    __DIR__ . '/../' . PATH_SEPARATOR . get_include_path()
+);
 
 require_once 'Text/LanguageDetect.php';
 require_once 'PHPUnit/Framework/TestCase.php';
@@ -28,6 +31,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         $err_result = $this->x->_setup_ok($err_obj);
 
+        $message = null;
         if (PEAR::isError($err_obj)) {
             $message = $err_obj->getMessage();
         }
@@ -52,9 +56,8 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
         $str = 'aa  aa';
         $result = $this->x->_trigram($str);
-        $this->assertEquals(null, $result['  a'], '  a');
-        $this->assertEquals(null, $result['a  '], 'a  ');
-
+        $this->assertArrayNotHasKey('  a', $result, '  a');
+        $this->assertArrayNotHasKey('a  ', $result, 'a  ');
     }
 
     function test_splitter2 ()
@@ -1035,6 +1038,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $results = $this->x->detect($str);
 
         $count = count($ranked);
+        $sum = 0;
 
         //foreach ($this->x->_lang_db['english'] as $key => $value) {
         foreach ($ranked as $key => $value) {
@@ -1119,22 +1123,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         );
 
 
-        //ksort($correct_ranks);
-        //ksort($ranked);
-        //$this->assertEquals($correct_ranks,$ranked);
         $this->assertEquals(count($correct_ranks), count($ranked), "different number of trigrams found");
-        //print_r($correct_ranks);
-        //print_r($ranked);
-        //print_r(array_diff_assoc($correct_ranks, $ranked));
-
-        if (count($correct_ranks) == count($ranks)) {
-            foreach ($correct_ranks as $key => $value) {
-                $this->assertTrue(isset($ranks[$key]), "$key was not set");
-                if (isset($ranks[$key])) {
-                    $this->assertEquals($value, $ranks[$key], "$key value incorrect");
-                }
-            }
-        }
 
         $distances = array(
             ' de' => array('change' => 0, 'baserank' => 1, 'refrank' => 1),
@@ -1195,18 +1184,12 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             $this->assertTrue(isset($distances[$key]), $key);
             if (isset($distances[$key])) {
                 $this->assertEquals($distances[$key]['baserank'], $ranked[$key], "baserank for $key");
-                $this->assertEquals($distances[$key]['refrank'], $french_ranks[$key], "refrank for $key");
-                $this->assertEquals($distances[$key]['change'], $difference, "difference for $key");
-
-                if ($distances[$key]['baserank'] != $ranked[$key] || $distances[$key]['refrank'] != $french_ranks[$key] || $distances[$key]['change'] != $difference) {
-                    
-                    // don't flood
-                    if ($local_errors++ > 10) {
-                        $this->assertTrue(false, 'Exiting to prevent flooding');
-                        break;
-                    }
+                if ($distances[$key]['refrank'] === null) {
+                    $this->assertArrayNotHasKey($key, $french_ranks);
+                } else {
+                    $this->assertEquals($distances[$key]['refrank'], $french_ranks[$key], "refrank for $key");
                 }
-
+                $this->assertEquals($distances[$key]['change'], $difference, "difference for $key");
             }
 
             $sumchange += $difference;
@@ -1296,17 +1279,12 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             $this->assertTrue(isset($correct_ranks[$key], $key));
             if (isset($correct_ranks[$key])) {
                 $this->assertEquals($correct_ranks[$key]['baserank'], $ranked[$key], "baserank for $key");
-                $this->assertEquals($correct_ranks[$key]['refrank'], $russian[$key], "refrank for $key");
-                $this->assertEquals($correct_ranks[$key]['change'], $difference, "difference for $key");
-
-                if ($correct_ranks[$key]['baserank'] != $ranked[$key] || $correct_ranks[$key]['refrank'] != $russian[$key] || $correct_ranks[$key]['change'] != $difference) {
-
-                    // don't flood
-                    if ($local_errors++ > 6) {
-                        $this->assertTrue(false, 'Exiting to prevent flooding');
-                        break;
-                    }
+                if ($correct_ranks[$key]['refrank'] === null) {
+                    $this->assertArrayNotHasKey($key, $russian);
+                } else {
+                    $this->assertEquals($correct_ranks[$key]['refrank'], $russian[$key], "refrank for $key");
                 }
+                $this->assertEquals($correct_ranks[$key]['change'], $difference, "difference for $key");
             }
 
             $sumchange += $difference;
