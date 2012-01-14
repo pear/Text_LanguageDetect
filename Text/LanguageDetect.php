@@ -9,7 +9,7 @@
  * Implements a version of a technique originally proposed by Cavnar & Trenkle 
  * (1994): "N-Gram-Based Text Categorization" 
  *
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * @category   Text
  * @package    Text_LanguageDetect
@@ -22,6 +22,7 @@
  */
 
 require_once 'PEAR.php';
+require_once 'Text/LanguageDetect/Exception.php';
 require_once 'Text/LanguageDetect/Parser.php';
 require_once 'Text/LanguageDetect/ISO639.php';
 
@@ -252,9 +253,9 @@ class Text_LanguageDetect
 
         // input check
         if (!file_exists($fname)) {
-            return PEAR::raiseError('Language database does not exist.');
+            throw new Text_LanguageDetect_Exception('Language database does not exist.');
         } elseif (!is_readable($fname)) {
-            return PEAR::raiseError('Language database is not readable.');
+            throw new Text_LanguageDetect_Exception('Language database is not readable.');
         }
 
         if (function_exists('file_get_contents')) {
@@ -288,16 +289,12 @@ class Text_LanguageDetect
 
         } elseif (!is_array($this->_lang_db)) {
             if (ini_get('magic_quotes_runtime')) {
-                $err = PEAR::raiseError('Error loading database. Try turning magic_quotes_runtime off.');
+                throw new Text_LanguageDetect_Exception('Error loading database. Try turning magic_quotes_runtime off.');
             } else {
-                $err = PEAR::raiseError('Language database is not an array.');
+                throw new Text_LanguageDetect_Exception('Language database is not an array.');
             }
-            return false;
-
         } elseif (empty($this->_lang_db)) {
-            $err =  PEAR::raiseError('Language database has no elements.');
-            return false;
-
+            throw new Text_LanguageDetect_Exception('Language database has no elements.');
         } else {
             return true;
         }
@@ -424,7 +421,7 @@ class Text_LanguageDetect
 
             // other (error)
             } else {
-                return PEAR::raiseError('Unknown type passed to languageExists()');
+                throw new Text_LanguageDetect_Exception('Unknown type passed to languageExists()');
             }
         }
     }
@@ -774,7 +771,7 @@ class Text_LanguageDetect
             if (is_array($blocks)) {
                 $present_blocks = array_keys($blocks);
             } else {
-                return PEAR::raiseError('Error during block detection');
+                throw new Text_LanguageDetect_Exception('Error during block detection');
             }
 
             $possible_langs = array();
@@ -964,11 +961,11 @@ class Text_LanguageDetect
     {
         // input check
         if (!is_bool($skip_symbols)) {
-            return PEAR::raiseError('Second parameter must be boolean');
+            throw new Text_LanguageDetect_Exception('Second parameter must be boolean');
         } 
 
         if (!is_string($str)) {
-            return PEAR::raiseError('First parameter was not a string');
+            throw new Text_LanguageDetect_Exception('First parameter was not a string');
         }
 
         $sample_obj = new Text_LanguageDetect_Parser($str);
@@ -1001,18 +998,18 @@ class Text_LanguageDetect
 
             // input check
             if ($this->utf8strlen($unicode) > 1) {
-                return PEAR::raiseError('Pass this function only a single char');
+                throw new Text_LanguageDetect_Exception('Pass this function only a single char');
             }
 
             $unicode = $this->_utf8char2unicode($unicode);
 
             if ($unicode == -1) {
-                return PEAR::raiseError('Malformatted char');
+                throw new Text_LanguageDetect_Exception('Malformatted char');
             }
 
         // input check
         } elseif (!is_int($unicode)) {
-            return PEAR::raiseError('Input must be of type string or int.');
+            throw new Text_LanguageDetect_Exception('Input must be of type string or int.');
         }
 
         $blocks =& $this->_read_unicode_block_db();
@@ -1253,7 +1250,7 @@ class Text_LanguageDetect
 
         foreach ($langs as $lang) {
             if (!isset($this->_lang_db[$lang])) {
-                return PEAR::raiseError("missing $lang!\n");
+                throw new Text_LanguageDetect_Exception("missing $lang!\n");
             }
         }
 
@@ -1281,7 +1278,7 @@ class Text_LanguageDetect
             
             if (!$highest_key1) {
                 // should not ever happen
-                return PEAR::raiseError("no highest key? (step: $i)");
+                throw new Text_LanguageDetect_Exception("no highest key? (step: $i)");
             }
 
             if ($highest_score == 0) {
