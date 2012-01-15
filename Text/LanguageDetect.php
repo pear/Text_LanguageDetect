@@ -244,7 +244,7 @@ class Text_LanguageDetect
             );
         } elseif (!is_readable($fname)) {
             throw new Text_LanguageDetect_Exception(
-                'Language database is not readable:' . $fname,
+                'Language database is not readable: ' . $fname,
                 Text_LanguageDetect_Exception::DB_NOT_READABLE
             );
         }

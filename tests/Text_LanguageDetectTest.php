@@ -16,12 +16,78 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
     function setup ()
     {
+        ini_set('magic_quotes_runtime', 0);
         $this->x = new Text_LanguageDetect();
     }
 
     function tearDown ()
     {
         unset($this->x);
+    }
+
+    function test_get_data_locAbsolute()
+    {
+        $this->assertEquals(
+            '/path/to/file',
+            $this->x->_get_data_loc('/path/to/file')
+        );
+    }
+
+    function test_get_data_locPearPath()
+    {
+        $this->x->_data_dir = '/path/to/pear/data';
+        $this->assertEquals(
+            '/path/to/pear/data/Text_LanguageDetect/file',
+            $this->x->_get_data_loc('file')
+        );
+    }
+
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Language database does not exist:
+     */
+    function test_readdbNonexistingFile()
+    {
+        $this->x->_readdb('thisfiledoesnotexist');
+    }
+
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Language database is not readable:
+     */
+    function test_readdbUnreadableFile()
+    {
+        $name = tempnam(sys_get_temp_dir(), 'unittest-Text_LanguageDetect-');
+        chmod($name, 0000);
+        $this->x->_readdb($name);
+    }
+
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Language database has no elements.
+     */
+    function test_checkTrigramEmpty()
+    {
+        $this->x->_checkTrigram(array());
+    }
+
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Language database is not an array
+     */
+    function test_checkTrigramNoArray()
+    {
+        $this->x->_checkTrigram('foo');
+    }
+
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Error loading database. Try turning magic_quotes_runtime off
+     */
+    function test_checkTrigramNoArrayMagicQuotes()
+    {
+        ini_set('magic_quotes_runtime', 1);
+        $this->x->_checkTrigram('foo');
     }
 
     function test_splitter ()
