@@ -86,7 +86,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
      */
     function test_checkTrigramNoArrayMagicQuotes()
     {
-        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+        if (version_compare(PHP_VERSION, '5.4.0-dev') >= 0) {
             $this->markTestSkipped('5.4.0 has no magic quotes anymore');
         }
         ini_set('magic_quotes_runtime', 1);
