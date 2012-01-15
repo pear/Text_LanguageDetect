@@ -220,8 +220,7 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
 
         // unicode startup
         if ($this->_compile_unicode) {
-            $blocks =& $this->_read_unicode_block_db();
-
+            $blocks = $this->_read_unicode_block_db();
             $block_count = count($blocks);
 
             $skipped_count = 0;

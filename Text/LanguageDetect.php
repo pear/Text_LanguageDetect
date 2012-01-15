@@ -21,7 +21,6 @@
  * @link       http://langdetect.blogspot.com/
  */
 
-require_once 'PEAR.php';
 require_once 'Text/LanguageDetect/Exception.php';
 require_once 'Text/LanguageDetect/Parser.php';
 require_once 'Text/LanguageDetect/ISO639.php';
@@ -176,15 +175,13 @@ class Text_LanguageDetect
     /**
      * Constructor
      *
-     * Will attempt to load the language database.
-     *
-     * @throws Text_LanguageDetect_Exception
-     * @todo Avoid work in the constructor
+     * Will attempt to load the language database. If it fails, you will get
+     * an exception.
      */
-    function Text_LanguageDetect()
+    function __construct()
     {
         $data = $this->_readdb($this->_db_filename);
-        
+        $this->_checkTrigram($data['trigram']);
         $this->_lang_db = $data['trigram'];
 
         if (isset($data['trigram-unicodemap'])) {
@@ -195,7 +192,6 @@ class Text_LanguageDetect
         if (isset($data['trigram-clusters'])) {
             $this->_clusters = $data['trigram-clusters'];
         }
-
     }
 
     /**
@@ -240,22 +236,18 @@ class Text_LanguageDetect
 
         // input check
         if (!file_exists($fname)) {
-            throw new Text_LanguageDetect_Exception('Language database does not exist.');
+            throw new Text_LanguageDetect_Exception(
+                'Language database does not exist.',
+                Text_LanguageDetect_Exception::DB_NOT_FOUND
+            );
         } elseif (!is_readable($fname)) {
-            throw new Text_LanguageDetect_Exception('Language database is not readable.');
+            throw new Text_LanguageDetect_Exception(
+                'Language database is not readable.',
+                Text_LanguageDetect_Exception::DB_NOT_READABLE
+            );
         }
 
-        if (function_exists('file_get_contents')) {
-            return unserialize(file_get_contents($fname));
-        } else {
-            // if you don't have file_get_contents(), 
-            // then this is the next fastest way
-            ob_start();
-            readfile($fname);
-            $contents = ob_get_contents();
-            ob_end_clean();
-            return unserialize($contents);
-        }
+        return unserialize(file_get_contents($fname));
     }
 
 
@@ -263,21 +255,27 @@ class Text_LanguageDetect
      * Checks if this object is ready to detect languages
      * 
      * @access   private
-     * @return   bool           true if no errors
-     * @throws Text_LanguageDetect_Exception
+     *
+     * @return void
      */
-    function _setup_ok()
+    function _checkTrigram($trigram)
     {
-        if (!is_array($this->_lang_db)) {
+        if (!is_array($trigram)) {
             if (ini_get('magic_quotes_runtime')) {
-                throw new Text_LanguageDetect_Exception('Error loading database. Try turning magic_quotes_runtime off.');
-            } else {
-                throw new Text_LanguageDetect_Exception('Language database is not an array.');
+                throw new Text_LanguageDetect_Exception(
+                    'Error loading database. Try turning magic_quotes_runtime off.',
+                    Text_LanguageDetect_Exception::MAGIC_QUOTES
+                );
             }
-        } elseif (empty($this->_lang_db)) {
-            throw new Text_LanguageDetect_Exception('Language database has no elements.');
-        } else {
-            return true;
+            throw new Text_LanguageDetect_Exception(
+                'Language database is not an array.',
+                Text_LanguageDetect_Exception::DB_NOT_ARRAY
+            );
+        } elseif (empty($trigram)) {
+            throw new Text_LanguageDetect_Exception(
+                'Language database has no elements.',
+                Text_LanguageDetect_Exception::DB_EMPTY
+            );
         }
     }
 
@@ -299,8 +297,6 @@ class Text_LanguageDetect
      */
     function omitLanguages($omit_list, $include_only = false)
     {
-        $this->_setup_ok();
-
         $deleted = 0;
 
         $omit_list = $this->_convertFromNameMode($omit_list);
@@ -360,31 +356,21 @@ class Text_LanguageDetect
      */
     function getLanguageCount()
     {
-        $this->_setup_ok();
-
         return count($this->_lang_db);
     }
 
     /**
-     * Returns true if a given language exists
-     *
-     * If passed an array of names, will return true only if all exist
-     *
      * @access    public
      * @param     mixed       $lang    language name or array of language names
      * @return    bool                 true if language model exists
-     * @throws   Text_LanguageDetect_Exception
      */
     function languageExists($lang)
     {
-        $this->_setup_ok();
-        
         $lang = $this->_convertFromNameMode($lang);
         // string
         if (is_string($lang)) {
             return isset($this->_lang_db[strtolower($lang)]);
 
-        // array
         } elseif (is_array($lang)) {
             foreach ($lang as $test_lang) {
                 if (!isset($this->_lang_db[strtolower($test_lang)])) {
@@ -393,9 +379,11 @@ class Text_LanguageDetect
             }
             return true;
 
-        // other (error)
         } else {
-            throw new Text_LanguageDetect_Exception('Unknown type passed to languageExists()');
+            throw new Text_LanguageDetect_Exception(
+                'Unknown type passed to languageExists()',
+                Text_LanguageDetect_Exception::UNKNOWN_TYPE
+            );
         }
     }
 
@@ -403,13 +391,11 @@ class Text_LanguageDetect
      * Returns the list of detectable languages
      *
      * @access public
-     * @return array        the names of the languages known to this object
+     * @return array        the names of the languages known to this object<<<<<<<
      * @throws   Text_LanguageDetect_Exception
      */
     function getLanguages()
     {
-        $this->_setup_ok();
-
         return $this->_convertToNameMode(
             array_keys($this->_lang_db)
         );
@@ -677,8 +663,6 @@ class Text_LanguageDetect
      */
     function detect($sample, $limit = 0)
     {
-        $this->_setup_ok();
-
         // input check
         if (!Text_LanguageDetect_Parser::validateString($sample)) {
             return array();
@@ -739,7 +723,10 @@ class Text_LanguageDetect
             if (is_array($blocks)) {
                 $present_blocks = array_keys($blocks);
             } else {
-                throw new Text_LanguageDetect_Exception('Error during block detection');
+                throw new Text_LanguageDetect_Exception(
+                    'Error during block detection',
+                    Text_LanguageDetect_Exception::ERR_BLOCK_DETECTION
+                );
             }
 
             $possible_langs = array();
@@ -921,11 +908,17 @@ class Text_LanguageDetect
     {
         // input check
         if (!is_bool($skip_symbols)) {
-            throw new Text_LanguageDetect_Exception('Second parameter must be boolean');
+            throw new Text_LanguageDetect_Exception(
+                'Second parameter must be boolean',
+                Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+            );
         } 
 
         if (!is_string($str)) {
-            throw new Text_LanguageDetect_Exception('First parameter was not a string');
+            throw new Text_LanguageDetect_Exception(
+                'First parameter was not a string',
+                Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+            );
         }
 
         $sample_obj = new Text_LanguageDetect_Parser($str);
@@ -933,7 +926,7 @@ class Text_LanguageDetect
         $sample_obj->prepareTrigram(false);
         $sample_obj->setUnicodeSkipSymbols($skip_symbols);
         $sample_obj->analyze();
-        $blocks =& $sample_obj->getUnicodeBlocks();
+        $blocks = $sample_obj->getUnicodeBlocks();
         unset($sample_obj);
         return $blocks;
     }
@@ -958,21 +951,30 @@ class Text_LanguageDetect
 
             // input check
             if ($this->utf8strlen($unicode) > 1) {
-                throw new Text_LanguageDetect_Exception('Pass this function only a single char');
+                throw new Text_LanguageDetect_Exception(
+                    'Pass this function only a single char',
+                    Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+                );
             }
 
             $unicode = $this->_utf8char2unicode($unicode);
 
             if ($unicode == -1) {
-                throw new Text_LanguageDetect_Exception('Malformatted char');
+                throw new Text_LanguageDetect_Exception(
+                    'Malformatted char',
+                    Text_LanguageDetect_Exception::ERR_INVALID_CHAR
+                );
             }
 
         // input check
         } elseif (!is_int($unicode)) {
-            throw new Text_LanguageDetect_Exception('Input must be of type string or int.');
+            throw new Text_LanguageDetect_Exception(
+                'Input must be of type string or int.',
+                Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+            );
         }
 
-        $blocks =& $this->_read_unicode_block_db();
+        $blocks = $this->_read_unicode_block_db();
 
         $result = $this->_unicode_block_name($unicode, $blocks);
 
@@ -1046,9 +1048,9 @@ class Text_LanguageDetect
      *
      * @access protected
      * @return array the database of unicode block definitions
-     * @throws   Text_LanguageDetect_Exception
+     * @throws Text_LanguageDetect_Exception
      */
-    function &_read_unicode_block_db() {
+    function _read_unicode_block_db() {
         // since the unicode definitions are always going to be the same,
         // might as well share the memory for the db with all other instances
         // of this class
@@ -1082,8 +1084,6 @@ class Text_LanguageDetect
      */
     function languageSimilarity($lang1 = null, $lang2 = null)
     {
-        $this->_setup_ok();
-
         $lang1 = $this->_convertFromNameMode($lang1);
         $lang2 = $this->_convertFromNameMode($lang2);
         if ($lang1 != null) {
@@ -1184,10 +1184,6 @@ class Text_LanguageDetect
     function clusterLanguages()
     {
         // todo: set the maximum number of clusters
-
-        // setup check
-        $this->_setup_ok();
-
         // return cached result, if any
         if (isset($this->_clusters)) {
             return $this->_clusters;
@@ -1201,7 +1197,10 @@ class Text_LanguageDetect
 
         foreach ($langs as $lang) {
             if (!isset($this->_lang_db[$lang])) {
-                throw new Text_LanguageDetect_Exception("missing $lang!\n");
+                throw new Text_LanguageDetect_Exception(
+                    "missing $lang!",
+                    Text_LanguageDetect_Exception::UNKNOWN_LANGUAGE
+                );
             }
         }
 
@@ -1229,7 +1228,10 @@ class Text_LanguageDetect
             
             if (!$highest_key1) {
                 // should not ever happen
-                throw new Text_LanguageDetect_Exception("no highest key? (step: $i)");
+                throw new Text_LanguageDetect_Exception(
+                    "no highest key? (step: $i)",
+                    Text_LanguageDetect_Exception::NO_HIGHEST_KEY
+                );
             }
 
             if ($highest_score == 0) {
@@ -1365,11 +1367,10 @@ class Text_LanguageDetect
      * @access  public
      * @param   string $str input string
      * @return  array language scores (only those compared)
-     * @throws   Text_LanguageDetect_Exception
+     * @throws  Text_LanguageDetect_Exception
      */
     function clusteredSearch($str)
     {
-
         // input check
         if (!Text_LanguageDetect_Parser::validateString($str)) {
             return array();

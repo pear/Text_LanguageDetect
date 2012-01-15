@@ -15,21 +15,12 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
     function setup ()
     {
-        $this->x = new Text_LanguageDetect;
-
-        if (!$this->x->_setup_ok($err)) {
-            $this->markTestSkipped($err->getMessage());
-        }
+        $this->x = new Text_LanguageDetect();
     }
 
     function tearDown ()
     {
         unset($this->x);
-    }
-
-    function test_setup ()
-    {
-        $err_result = $this->x->_setup_ok($err_obj);
     }
 
     function test_splitter ()
@@ -1489,13 +1480,9 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         // omit all languages and you should get an error
         $myobj->omitLanguages($myobj->getLanguages());
 
-        try {
-            $result = $myobj->detectSimple($str);
+        $result = $myobj->detectSimple($str);
 
-            $this->fail("Expected an exception for all languages being missing. " . gettype($result));
-        } catch (Text_LanguageDetect_Exception $e) {
-            $this->assertSame("No languages", $e->getMessage());
-        }
+        $this->assertNull($result, gettype($result));
     }
 
     function test_cyrillic ()
@@ -1581,7 +1568,6 @@ EOF;
 
         foreach ($unicode as $range => $codepoint) {
             $result = $this->x->unicodeBlockName($this->code2utf($codepoint));
-
             $this->assertEquals($range, $result, $codepoint);
         }
     }
