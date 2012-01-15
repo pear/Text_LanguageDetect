@@ -43,9 +43,10 @@ require_once 'Text/LanguageDetect/ISO639.php';
  *
  * echo "Supported languages:\n";
  *
- * $langs = $l->getLanguages();
- * if (PEAR::isError($langs)) {
- *     die($langs->getMessage());
+ * try {
+ *     $langs = $l->getLanguages();
+ * } catch (Text_LanguageDetect_Exception $e) {
+ *     die($e->getMessage());
  * }
  *
  * sort($langs);
@@ -104,9 +105,6 @@ class Text_LanguageDetect
      * 
      * Will be loaded on start from $this->_db_filename
      *
-     * May be set to a PEAR_Error object if there is an error during its 
-     * initialization
-     *
      * @var      array
      * @access   private
      */
@@ -119,14 +117,6 @@ class Text_LanguageDetect
      * @var array
      */
     var $_unicode_map;
-
-    /**
-     * stores any errors during setup
-     *
-     * @access private
-     * @var PEAR_Error
-     */
-    var $_setup_error;
 
     /**
      * The size of the trigram data arrays
@@ -186,29 +176,26 @@ class Text_LanguageDetect
     /**
      * Constructor
      *
-     * Will attempt to load the language database. If it fails, you will get
-     * a PEAR_Error object returned when you try to use detect()
+     * Will attempt to load the language database.
      *
+     * @throws Text_LanguageDetect_Exception
+     * @todo Avoid work in the constructor
      */
     function Text_LanguageDetect()
     {
         $data = $this->_readdb($this->_db_filename);
-        if (PEAR::isError($data)) {
-            // if error, save the error message
-            $this->_setup_error = $data;
+        
+        $this->_lang_db = $data['trigram'];
 
-        } else {
-            $this->_lang_db = $data['trigram'];
-
-            if (isset($data['trigram-unicodemap'])) {
-                $this->_unicode_map = $data['trigram-unicodemap'];
-            }
-
-            // Not yet implemented:
-            if (isset($data['trigram-clusters'])) {
-                $this->_clusters = $data['trigram-clusters'];
-            }
+        if (isset($data['trigram-unicodemap'])) {
+            $this->_unicode_map = $data['trigram-unicodemap'];
         }
+
+        // Not yet implemented:
+        if (isset($data['trigram-clusters'])) {
+            $this->_clusters = $data['trigram-clusters'];
+        }
+
     }
 
     /**
@@ -244,7 +231,7 @@ class Text_LanguageDetect
      * @access    private
      * @param     string      $fname   the filename where the data is stored
      * @return    array                the language model data
-     * @throws    PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function _readdb($fname)
     {
@@ -276,18 +263,12 @@ class Text_LanguageDetect
      * Checks if this object is ready to detect languages
      * 
      * @access   private
-     * @param    mixed   &$err  error object to be returned by reference, if any
      * @return   bool           true if no errors
+     * @throws Text_LanguageDetect_Exception
      */
-    function _setup_ok(&$err)
+    function _setup_ok()
     {
-        if (PEAR::isError($this->_setup_error)) {
-            // if there was an error from when the language database was loaded
-            // then return that error
-            $err = $this->_setup_error;
-            return false;
-
-        } elseif (!is_array($this->_lang_db)) {
+        if (!is_array($this->_lang_db)) {
             if (ini_get('magic_quotes_runtime')) {
                 throw new Text_LanguageDetect_Exception('Error loading database. Try turning magic_quotes_runtime off.');
             } else {
@@ -314,15 +295,11 @@ class Text_LanguageDetect
      * @param    bool   $include_only   if true will include (rather than 
      *                                  exclude) only those in the list
      * @return   int                    number of languages successfully deleted
-     * @throws   PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function omitLanguages($omit_list, $include_only = false)
     {
-
-        // setup check
-        if (!$this->_setup_ok($err)) {
-            return $err;
-        }
+        $this->_setup_ok();
 
         $deleted = 0;
 
@@ -379,15 +356,13 @@ class Text_LanguageDetect
      *
      * @access public
      * @return int            the number of languages
-     * @throws PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function getLanguageCount()
     {
-        if (!$this->_setup_ok($err)) {
-            return $err;
-        } else {
-            return count($this->_lang_db);
-        }
+        $this->_setup_ok();
+
+        return count($this->_lang_db);
     }
 
     /**
@@ -398,31 +373,29 @@ class Text_LanguageDetect
      * @access    public
      * @param     mixed       $lang    language name or array of language names
      * @return    bool                 true if language model exists
-     * @throws    PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function languageExists($lang)
     {
-        if (!$this->_setup_ok($err)) {
-            return $err;
-        } else {
-            $lang = $this->_convertFromNameMode($lang);
-            // string
-            if (is_string($lang)) {
-                return isset($this->_lang_db[strtolower($lang)]);
+        $this->_setup_ok();
+        
+        $lang = $this->_convertFromNameMode($lang);
+        // string
+        if (is_string($lang)) {
+            return isset($this->_lang_db[strtolower($lang)]);
 
-            // array
-            } elseif (is_array($lang)) {
-                foreach ($lang as $test_lang) {
-                    if (!isset($this->_lang_db[strtolower($test_lang)])) {
-                        return false;
-                    } 
-                }
-                return true;
-
-            // other (error)
-            } else {
-                throw new Text_LanguageDetect_Exception('Unknown type passed to languageExists()');
+        // array
+        } elseif (is_array($lang)) {
+            foreach ($lang as $test_lang) {
+                if (!isset($this->_lang_db[strtolower($test_lang)])) {
+                    return false;
+                } 
             }
+            return true;
+
+        // other (error)
+        } else {
+            throw new Text_LanguageDetect_Exception('Unknown type passed to languageExists()');
         }
     }
 
@@ -431,17 +404,15 @@ class Text_LanguageDetect
      *
      * @access public
      * @return array        the names of the languages known to this object
-     * @throws PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function getLanguages()
     {
-        if (!$this->_setup_ok($err)) {
-            return $err;
-        } else {
-            return $this->_convertToNameMode(
-                array_keys($this->_lang_db)
-            );
-        }
+        $this->_setup_ok();
+
+        return $this->_convertToNameMode(
+            array_keys($this->_lang_db)
+        );
     }
 
     /**
@@ -700,16 +671,13 @@ class Text_LanguageDetect
      * @param   int     $limit  if specified, return an array of the most likely
      *                           $limit languages and their scores.
      * @return  mixed       sorted array of language scores, blank array if no 
-     *                      useable text was found, or PEAR_Error if error 
-     *                      with the object setup
+     *                      useable text was found
      * @see     _distance()
-     * @throws  PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function detect($sample, $limit = 0)
     {
-        if (!$this->_setup_ok($err)) {
-            return $err;
-        }
+        $this->_setup_ok();
 
         // input check
         if (!Text_LanguageDetect_Parser::validateString($sample)) {
@@ -855,15 +823,11 @@ class Text_LanguageDetect
      * @return   string               the name of the most likely language
      *                                or null if no language is similar
      * @see      detect()
-     * @throws   PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function detectSimple($sample)
     {
         $scores = $this->detect($sample, 1);
-
-        if (PEAR::isError($scores)) {
-            return $scores;
-        }
 
         // if top language has the maximum possible score,
         // then the top score will have been picked at random
@@ -901,15 +865,11 @@ class Text_LanguageDetect
      * @return   array     most similar language, score and confidence rating
      *                     or null if no language is similar
      * @see      detect()
-     * @throws   PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function detectConfidence($sample)
     {
         $scores = $this->detect($sample, 2);
-
-        if (PEAR::isError($scores)) {
-            return $scores;
-        }
 
         // if most similar language has the max score, it 
         // will have been picked at random
@@ -955,7 +915,7 @@ class Text_LanguageDetect
      *                           non-printing characters. Includes spaces,
      *                           newlines and common punctutation characters.
      * @return array
-     * @throws PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function detectUnicodeBlocks($str, $skip_symbols)
     {
@@ -990,7 +950,7 @@ class Text_LanguageDetect
      * @access public
      * @param mixed $unicode unicode value or utf8 char
      * @return mixed the block name string or false if not found
-     * @throws PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function unicodeBlockName($unicode) {
         if (is_string($unicode)) {
@@ -1013,11 +973,6 @@ class Text_LanguageDetect
         }
 
         $blocks =& $this->_read_unicode_block_db();
-
-        // there might have been a setup error for the block database
-        if (PEAR::isError($blocks)) {
-            return $blocks;
-        }
 
         $result = $this->_unicode_block_name($unicode, $blocks);
 
@@ -1091,7 +1046,7 @@ class Text_LanguageDetect
      *
      * @access protected
      * @return array the database of unicode block definitions
-     * @throws PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function &_read_unicode_block_db() {
         // since the unicode definitions are always going to be the same,
@@ -1123,13 +1078,11 @@ class Text_LanguageDetect
      * @return  array    scores of every language compared
      *                   or the score of just the provided languages
      *                   or null if one of the supplied languages does not exist
-     * @throws  PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function languageSimilarity($lang1 = null, $lang2 = null)
     {
-        if (!$this->_setup_ok($err)) {
-            return $err;
-        }
+        $this->_setup_ok();
 
         $lang1 = $this->_convertFromNameMode($lang1);
         $lang2 = $this->_convertFromNameMode($lang2);
@@ -1223,7 +1176,7 @@ class Text_LanguageDetect
      *
      * @access      public
      * @return      array language cluster data
-     * @throws      PEAR_Error
+     * @throws      Text_LanguageDetect_Exception
      * @see         languageSimilarity()
      * @deprecated  this function will eventually be removed and placed into 
      *              the model generation class
@@ -1233,9 +1186,7 @@ class Text_LanguageDetect
         // todo: set the maximum number of clusters
 
         // setup check
-        if (!$this->_setup_ok($err)) {
-            return $err;
-        }
+        $this->_setup_ok();
 
         // return cached result, if any
         if (isset($this->_clusters)) {
@@ -1414,7 +1365,7 @@ class Text_LanguageDetect
      * @access  public
      * @param   string $str input string
      * @return  array language scores (only those compared)
-     * @throws  PEAR_Error
+     * @throws   Text_LanguageDetect_Exception
      */
     function clusteredSearch($str)
     {
@@ -1427,10 +1378,6 @@ class Text_LanguageDetect
         // clusterLanguages() will return a cached result if possible
         // so it's safe to call it every time
         $result = $this->clusterLanguages();
-
-        if (PEAR::isError($result)) {
-            return $result;
-        }
 
         $dendogram_start = $result['open_forks'];
         $dendogram_data  = $result['fork_data'];
