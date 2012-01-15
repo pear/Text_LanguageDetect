@@ -215,7 +215,7 @@ class Text_LanguageDetect
         } else {
             // assume this was just unpacked somewhere
             // try the local working directory if otherwise
-            return '../data/' . $fname;
+            return __DIR__ . '/../data/' . $fname;
         }
     }
 
