@@ -237,12 +237,12 @@ class Text_LanguageDetect
         // input check
         if (!file_exists($fname)) {
             throw new Text_LanguageDetect_Exception(
-                'Language database does not exist.',
+                'Language database does not exist: ' . $fname,
                 Text_LanguageDetect_Exception::DB_NOT_FOUND
             );
         } elseif (!is_readable($fname)) {
             throw new Text_LanguageDetect_Exception(
-                'Language database is not readable.',
+                'Language database is not readable:' . $fname,
                 Text_LanguageDetect_Exception::DB_NOT_READABLE
             );
         }
