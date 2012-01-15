@@ -482,7 +482,7 @@ class Text_LanguageDetect
      * @param     array     $arr     array of trgram 
      * @return    array              ranks of trigrams
      */
-    function _arr_rank(&$arr)
+    function _arr_rank($arr)
     {
 
         // sorts alphabetically first as a standard way of breaking rank ties
@@ -950,7 +950,7 @@ class Text_LanguageDetect
             // assume it is being passed a utf8 char, so convert it
 
             // input check
-            if ($this->utf8strlen($unicode) > 1) {
+            if (self::utf8strlen($unicode) > 1) {
                 throw new Text_LanguageDetect_Exception(
                     'Pass this function only a single char',
                     Text_LanguageDetect_Exception::PARAM_TYPE
@@ -1489,12 +1489,11 @@ class Text_LanguageDetect
      *
      * Returns the numbers of characters (not bytes) in a utf8 string
      *
-     * @static
      * @access  public
      * @param   string $str string to get the length of
      * @return  int         number of chars
      */
-    function utf8strlen($str)
+    static function utf8strlen($str)
     {
         // utf8_decode() will convert unknown chars to '?', which is actually
         // ideal for counting.
@@ -1565,12 +1564,12 @@ class Text_LanguageDetect
      * $counter will be incremeted by the number of bytes in the char.
      *
      * @access  private
-     * @param   string  &$str        the string being iterated over
+     * @param   string  $str         the string being iterated over
      * @param   int     &$counter    the iterator, will increment by reference
      * @param   bool    $special_convert whether to do special conversions
      * @return  char    the next (possibly multi-byte) char from $counter
      */
-    function _next_char(&$str, &$counter, $special_convert = false)
+    static function _next_char($str, &$counter, $special_convert = false)
     {
 
         $char = $str{$counter++};

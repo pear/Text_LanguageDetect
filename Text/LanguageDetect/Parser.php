@@ -109,12 +109,10 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
     /**
      * Returns true if a string is suitable for parsing
      *
-     * @static
-     * @access  public
      * @param   string  $str    input string to test
      * @return  bool            true if acceptable, false if not
      */
-    function validateString($str) {
+    public static function validateString($str) {
         if (!empty($str) && strlen($str) > 3 && preg_match('/\S/', $str)) {
             return true;
         } else {

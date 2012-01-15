@@ -7,6 +7,7 @@
 set_include_path(
     __DIR__ . '/../' . PATH_SEPARATOR . get_include_path()
 );
+error_reporting(E_ALL|E_STRICT);
 
 require_once 'Text/LanguageDetect.php';
 require_once 'PHPUnit/Framework/TestCase.php';
