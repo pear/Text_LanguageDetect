@@ -382,7 +382,7 @@ class Text_LanguageDetect
         } else {
             throw new Text_LanguageDetect_Exception(
                 'Unknown type passed to languageExists()',
-                Text_LanguageDetect_Exception::UNKNOWN_TYPE
+                Text_LanguageDetect_Exception::PARAM_TYPE
             );
         }
     }
@@ -725,7 +725,7 @@ class Text_LanguageDetect
             } else {
                 throw new Text_LanguageDetect_Exception(
                     'Error during block detection',
-                    Text_LanguageDetect_Exception::ERR_BLOCK_DETECTION
+                    Text_LanguageDetect_Exception::BLOCK_DETECTION
                 );
             }
 
@@ -910,14 +910,14 @@ class Text_LanguageDetect
         if (!is_bool($skip_symbols)) {
             throw new Text_LanguageDetect_Exception(
                 'Second parameter must be boolean',
-                Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+                Text_LanguageDetect_Exception::PARAM_TYPE
             );
         } 
 
         if (!is_string($str)) {
             throw new Text_LanguageDetect_Exception(
                 'First parameter was not a string',
-                Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+                Text_LanguageDetect_Exception::PARAM_TYPE
             );
         }
 
@@ -953,7 +953,7 @@ class Text_LanguageDetect
             if ($this->utf8strlen($unicode) > 1) {
                 throw new Text_LanguageDetect_Exception(
                     'Pass this function only a single char',
-                    Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+                    Text_LanguageDetect_Exception::PARAM_TYPE
                 );
             }
 
@@ -962,7 +962,7 @@ class Text_LanguageDetect
             if ($unicode == -1) {
                 throw new Text_LanguageDetect_Exception(
                     'Malformatted char',
-                    Text_LanguageDetect_Exception::ERR_INVALID_CHAR
+                    Text_LanguageDetect_Exception::INVALID_CHAR
                 );
             }
 
@@ -970,7 +970,7 @@ class Text_LanguageDetect
         } elseif (!is_int($unicode)) {
             throw new Text_LanguageDetect_Exception(
                 'Input must be of type string or int.',
-                Text_LanguageDetect_Exception::ERR_PARAM_TYPE
+                Text_LanguageDetect_Exception::PARAM_TYPE
             );
         }
 
