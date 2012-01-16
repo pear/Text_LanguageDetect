@@ -1076,11 +1076,7 @@ class Text_LanguageDetect
             }
 
             if ($lang2 != null) {
-
-                if ($lang1 == null) {
-                    // can't only set the second param
-                    return null;
-                } elseif (!isset($this->_lang_db[$lang2])) {
+                if (!isset($this->_lang_db[$lang2])) {
                     // check if language model exists
                     return null;
                 }

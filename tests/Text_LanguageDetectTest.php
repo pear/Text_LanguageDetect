@@ -1547,6 +1547,16 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($eng_dan > $nor_dan); // english is less similar to danish than norwegian is
     }
 
+    function testLanguageSimilarityUnknownLanguage()
+    {
+        $this->assertNull($this->x->languageSimilarity('doesnotexist'));
+    }
+
+    function testLanguageSimilarityUnknownLanguage2()
+    {
+        $this->assertNull($this->x->languageSimilarity('english', 'doesnotexist'));
+    }
+
     function test_compatibility ()
     {
         $str = "I am the very model of a modern major general.";
