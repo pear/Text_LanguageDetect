@@ -170,7 +170,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(null, $result);
     }
 
-    function test_omit ()
+    function testOmitLanguages()
     {
         $str = 'This function may return Boolean FALSE, but may also return a non-Boolean value which evaluates to FALSE, such as 0 or "". Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.';
 
@@ -211,10 +211,28 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         unset($myobj);
     }
 
-    function test_omitNameMode2()
+    function testOmitLanguagesNameMode2()
     {
         $this->x->setNameMode(2);
         $this->assertEquals(1, $this->x->omitLanguages('en'));
+    }
+
+    function testOmitLanguagesIncludeString()
+    {
+        $this->assertGreaterThan(1, $this->x->omitLanguages('english', true));
+        $langs = $this->x->getLanguages();
+        $this->assertEquals(1, count($langs));
+        $this->assertContains('english', $langs);
+    }
+
+    function testOmitLanguagesClearsClusterCache()
+    {
+        $this->x->omitLanguages(array('english', 'german'), true);
+        $this->assertNull($this->x->_clusters);
+        $this->x->clusterLanguages();
+        $this->assertNotNull($this->x->_clusters);
+        $this->x->omitLanguages('german');
+        $this->assertNull($this->x->_clusters, 'cluster cache be empty now');
     }
 
     function test_perl_compatibility()
@@ -1396,6 +1414,15 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($this->x->languageExists(array('en', 'doesnotexist')));
     }
 
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Unsupported parameter type passed to languageExists()
+     */
+    function testLanguageExistsUnsupportedType()
+    {
+        $this->x->languageExists(1.23);
+    }
+
     function testGetLanguages()
     {
         $langs = $this->x->getLanguages();
@@ -1450,6 +1477,15 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $lang = $this->x->detectSimple('Das ist ein kleiner Text für euch alle');
         $this->assertInternalType('string', $lang);
         $this->assertEquals('de', $lang, 'text is german');
+    }
+
+    function testDetectSimpleNoLanguages()
+    {
+        $this->x->omitLanguages('english', true);
+        $this->x->omitLanguages('english', false);
+        $this->assertNull(
+            $this->x->detectSimple('Das ist ein kleiner Text für euch alle')
+        );
     }
 
     function testLanguageSimilarity()
@@ -1536,6 +1572,11 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($similarity <= 300 && $similarity >= 1, $similarity);
         $this->assertTrue($confidence <= 1 && $confidence >= 0, $confidence);
 
+    }
+
+    function testDetectConfidenceNoText()
+    {
+        $this->assertNull($this->x->detectConfidence(''));
     }
 
     function test_omit_error ()
@@ -1640,6 +1681,24 @@ EOF;
             $result = $this->x->unicodeBlockName($this->code2utf($codepoint));
             $this->assertEquals($range, $result, $codepoint);
         }
+    }
+
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Pass a single char only to this method
+     */
+    function testUnicodeBlockNameParamString()
+    {
+        $this->x->unicodeBlockName('foo bar baz');
+    }
+
+    /**
+     * @expectedException Text_LanguageDetect_Exception
+     * @expectedExceptionMessage Input must be of type string or int
+     */
+    function testUnicodeBlockNameUnsupportedParamType()
+    {
+        $this->x->unicodeBlockName(1.23);
     }
 
 

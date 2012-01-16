@@ -343,7 +343,7 @@ class Text_LanguageDetect
         // reset the cluster cache if the number of languages changes
         // this will then have to be recalculated
         if (isset($this->_clusters) && $deleted > 0) {
-            unset($this->_clusters);
+            $this->_clusters = null;
         }
 
         return $deleted;
@@ -386,7 +386,7 @@ class Text_LanguageDetect
 
         } else {
             throw new Text_LanguageDetect_Exception(
-                'Unknown type passed to languageExists()',
+                'Unsupported parameter type passed to languageExists()',
                 Text_LanguageDetect_Exception::PARAM_TYPE
             );
         }
@@ -697,18 +697,9 @@ class Text_LanguageDetect
             if ($encoding != 'ASCII' && $encoding != 'UTF-8'
                 && $encoding !== false
             ) {
-                if (function_exists('mb_list_encodings')) {
-                    // verify the encoding exists in mb_list_encodings
-                    if (in_array($encoding, mb_list_encodings())) {
-                        $sample = mb_convert_encoding($sample, 'UTF-8', $encoding);
-                    }
-
-                    // if the previous condition failed:
-                    // somehow we detected an encoding that also we don't support
-                } else {
-                    // php 4 doesnt have mb_list_encodings()
-                    // so attempt with error suppression
-                    $sample = @mb_convert_encoding($sample, 'UTF-8', $encoding);
+                // verify the encoding exists in mb_list_encodings
+                if (in_array($encoding, mb_list_encodings())) {
+                    $sample = mb_convert_encoding($sample, 'UTF-8', $encoding);
                 }
             }
         }
@@ -831,8 +822,7 @@ class Text_LanguageDetect
 
         // if top language has the maximum possible score,
         // then the top score will have been picked at random
-        if (!is_array($scores)
-            || empty($scores)
+        if (!is_array($scores) || empty($scores)
             || current($scores) == $this->_max_score
         ) {
             return null;
@@ -872,8 +862,7 @@ class Text_LanguageDetect
 
         // if most similar language has the max score, it
         // will have been picked at random
-        if (!is_array($scores)
-            || empty($scores)
+        if (!is_array($scores) || empty($scores)
             || current($scores) == $this->_max_score
         ) {
             return null;
@@ -916,20 +905,8 @@ class Text_LanguageDetect
      */
     public function detectUnicodeBlocks($str, $skip_symbols)
     {
-        // input check
-        if (!is_bool($skip_symbols)) {
-            throw new Text_LanguageDetect_Exception(
-                'Second parameter must be boolean',
-                Text_LanguageDetect_Exception::PARAM_TYPE
-            );
-        }
-
-        if (!is_string($str)) {
-            throw new Text_LanguageDetect_Exception(
-                'First parameter was not a string',
-                Text_LanguageDetect_Exception::PARAM_TYPE
-            );
-        }
+        $skip_symbols = (bool)$skip_symbols;
+        $str          = (string)$str;
 
         $sample_obj = new Text_LanguageDetect_Parser($str);
         $sample_obj->prepareUnicode();
@@ -961,19 +938,11 @@ class Text_LanguageDetect
             // assume it is being passed a utf8 char, so convert it
             if (self::utf8strlen($unicode) > 1) {
                 throw new Text_LanguageDetect_Exception(
-                    'Pass this function only a single char',
+                    'Pass a single char only to this method',
                     Text_LanguageDetect_Exception::PARAM_TYPE
                 );
             }
-
             $unicode = $this->_utf8char2unicode($unicode);
-
-            if ($unicode == -1) {
-                throw new Text_LanguageDetect_Exception(
-                    'Malformatted char',
-                    Text_LanguageDetect_Exception::INVALID_CHAR
-                );
-            }
 
         } elseif (!is_int($unicode)) {
             throw new Text_LanguageDetect_Exception(
@@ -1219,6 +1188,8 @@ class Text_LanguageDetect
             $langs[$lang1] = $lang1;
             unset($langs[$old_key]);
         }
+
+        $result_data = $really_map = array();
 
         $i = 0;
         while (count($langs) > 2 && $i++ < 200) {
@@ -1521,7 +1492,7 @@ class Text_LanguageDetect
      *
      * @param string $char a utf8 (possibly multi-byte) char
      *
-     * @return int unicode value or -1 if malformatted
+     * @return int unicode value
      * @access protected
      * @link   http://en.wikipedia.org/wiki/UTF-8
      */
@@ -1558,10 +1529,6 @@ class Text_LanguageDetect
             $x1 = (ord($char{2}) & 0x0000003F) << 6;
             $x2 = (ord($char{3}) & 0x0000003F);
             return ($z1 | $z2 | $x1 | $x2);
-
-        default:
-            // error: malformatted char?
-            return -1;
         }
     }
 
