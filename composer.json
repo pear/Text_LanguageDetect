@@ -8,7 +8,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "Text_LanguageDetect": "./"
+            "Text": "./"
         }
     },
     "description": "More info available on: http://pear.php.net/package/Text_LanguageDetect",
