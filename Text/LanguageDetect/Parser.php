@@ -102,7 +102,7 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
      * @access  private
      * @param   string  $string     string to be parsed
      */
-    function Text_LanguageDetect_Parser($string) {
+    function __construct($string) {
         $this->_string = $string;
     }
 
