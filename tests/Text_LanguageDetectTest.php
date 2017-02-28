@@ -10,7 +10,6 @@ set_include_path(
 error_reporting(E_ALL|E_STRICT);
 
 require_once 'Text/LanguageDetect.php';
-require_once 'PHPUnit/Framework/TestCase.php';
 
 class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
