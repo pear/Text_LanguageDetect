@@ -73,8 +73,8 @@ class Text_LanguageDetect
      * If this value starts with a slash (/) or a dot (.) the value of
      * $this->_data_dir will be ignored
      *
-     * @var      string
-     * @access   private
+     * @var    string
+     * @access private
      */
     var $_db_filename = 'lang.dat';
 
@@ -84,7 +84,7 @@ class Text_LanguageDetect
      * If this value starts with a slash (/) or a dot (.) the value of
      * $this->_data_dir will be ignored
      *
-     * @var string
+     * @var    string
      * @access private
      */
     var $_unicode_db_filename = 'unicode_blocks.dat';
@@ -94,8 +94,8 @@ class Text_LanguageDetect
      *
      * Should be set by PEAR installer
      *
-     * @var      string
-     * @access   private
+     * @var    string
+     * @access private
      */
     var $_data_dir = '@data_dir@';
 
@@ -104,8 +104,8 @@ class Text_LanguageDetect
      *
      * Will be loaded on start from $this->_db_filename
      *
-     * @var      array
-     * @access   private
+     * @var    array
+     * @access private
      */
     var $_lang_db = array();
 
@@ -113,15 +113,15 @@ class Text_LanguageDetect
      * stores the map of the trigram data to unicode characters
      *
      * @access private
-     * @var array
+     * @var    array
      */
     var $_unicode_map;
 
     /**
      * The size of the trigram data arrays
      *
-     * @var      int
-     * @access   private
+     * @var    int
+     * @access private
      */
     var $_threshold = 300;
 
@@ -131,18 +131,18 @@ class Text_LanguageDetect
      * needed for score normalization. Different depending on the
      * perl compatibility setting
      *
-     * @access  private
-     * @var     int
-     * @see     setPerlCompatible()
+     * @access private
+     * @var    int
+     * @see    setPerlCompatible()
      */
     var $_max_score = 0;
 
     /**
      * Whether or not to simulate perl's Language::Guess exactly
      *
-     * @access  private
-     * @var     bool
-     * @see     setPerlCompatible()
+     * @access private
+     * @var    bool
+     * @see    setPerlCompatible()
      */
     var $_perl_compatible = false;
 
@@ -150,16 +150,16 @@ class Text_LanguageDetect
      * Whether to use the unicode block detection to speed up processing
      *
      * @access private
-     * @var bool
+     * @var    bool
      */
     var $_use_unicode_narrowing = true;
 
     /**
      * stores the result of the clustering operation
      *
-     * @access  private
-     * @var     array
-     * @see     clusterLanguages()
+     * @access private
+     * @var    array
+     * @see    clusterLanguages()
      */
     var $_clusters;
 
@@ -355,7 +355,7 @@ class Text_LanguageDetect
      *
      * @access public
      * @return int            the number of languages
-     * @throws   Text_LanguageDetect_Exception
+     * @throws Text_LanguageDetect_Exception
      */
     function getLanguageCount()
     {
@@ -397,7 +397,7 @@ class Text_LanguageDetect
      *
      * @access public
      * @return array        the names of the languages known to this object<<<<<<<
-     * @throws   Text_LanguageDetect_Exception
+     * @throws Text_LanguageDetect_Exception
      */
     function getLanguages()
     {
@@ -1149,11 +1149,11 @@ class Text_LanguageDetect
      * Uses a nearest neighbor technique to generate the maximum possible
      * number of dendograms from the similarity data.
      *
-     * @access      public
-     * @return      array language cluster data
-     * @throws      Text_LanguageDetect_Exception
-     * @see         languageSimilarity()
-     * @deprecated  this function will eventually be removed and placed into
+     * @access     public
+     * @return     array language cluster data
+     * @throws     Text_LanguageDetect_Exception
+     * @see        languageSimilarity()
+     * @deprecated this function will eventually be removed and placed into
      *              the model generation class
      */
     function clusterLanguages()
