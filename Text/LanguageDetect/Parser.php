@@ -180,7 +180,7 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
      * @access  public
      * @return  array    trigram ranks in the text sample
      */
-    function &getTrigramRanks()
+    function getTrigramRanks()
     {
         return $this->_trigram_ranks;
     }
@@ -193,7 +193,7 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
      * @access  public
      * @return  array    trigram freqencies in the text sample
      */
-    function &getTrigramFreqs()
+    function getTrigramFreqs()
     {
         return $this->_trigram;
     }
@@ -204,7 +204,7 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
      * @access  public
      * @return  array   unicode blocks in the text sample
      */
-    function &getUnicodeBlocks()
+    function getUnicodeBlocks()
     {
         return $this->_unicode_blocks;
     }

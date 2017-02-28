@@ -712,7 +712,7 @@ class Text_LanguageDetect
         $sample_obj->setPadStart(!$this->_perl_compatible);
         $sample_obj->analyze();
 
-        $trigram_freqs =& $sample_obj->getTrigramRanks();
+        $trigram_freqs = $sample_obj->getTrigramRanks();
         $trigram_count = count($trigram_freqs);
 
         if ($trigram_count == 0) {
@@ -723,7 +723,7 @@ class Text_LanguageDetect
 
         // use unicode block detection to narrow down the possibilities
         if ($this->_use_unicode_narrowing) {
-            $blocks =& $sample_obj->getUnicodeBlocks();
+            $blocks = $sample_obj->getUnicodeBlocks();
 
             if (is_array($blocks)) {
                 $present_blocks = array_keys($blocks);
