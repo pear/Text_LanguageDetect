@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="PEAR-StreamVar">
+ <rule ref="PEAR">
+  <!-- we keep the old php4-style variable names for now -->
+  <exclude name="PEAR.NamingConventions.ValidFunctionName.PublicUnderscore"/>
+  <exclude name="PEAR.NamingConventions.ValidVariableName.PublicUnderscore"/>
+ </rule>
+</ruleset>
