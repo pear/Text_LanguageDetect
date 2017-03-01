@@ -1,4 +1,20 @@
 <?php
+/**
+ * Part of Text_LanguageDetect
+ *
+ * PHP version 5
+ *
+ * @category  Text
+ * @package   Text_LanguageDetect
+ * @author    Nicholas Pisarro <infinityminusnine+pear@gmail.com>
+ * @copyright 2005-2006 Nicholas Pisarro
+ * @license   BSD http://www.opensource.org/licenses/bsd-license.php
+ * @link      http://pear.php.net/package/Text_LanguageDetect/
+ */
+
+require_once 'Text/LanguageDetect/Exception.php';
+require_once 'Text/LanguageDetect/Parser.php';
+require_once 'Text/LanguageDetect/ISO639.php';
 
 /**
  * Detects the language of a given piece of text.
@@ -9,26 +25,7 @@
  * Implements a version of a technique originally proposed by Cavnar & Trenkle
  * (1994): "N-Gram-Based Text Categorization"
  *
- * PHP version 5
- *
- * @category  Text
- * @package   Text_LanguageDetect
- * @author    Nicholas Pisarro <infinityminusnine+pear@gmail.com>
- * @copyright 2005-2006 Nicholas Pisarro
- * @license   http://www.debian.org/misc/bsd.license BSD
- * @version   SVN: $Id$
- * @link      http://pear.php.net/package/Text_LanguageDetect/
- * @link      http://langdetect.blogspot.com/
- */
-
-require_once 'Text/LanguageDetect/Exception.php';
-require_once 'Text/LanguageDetect/Parser.php';
-require_once 'Text/LanguageDetect/ISO639.php';
-
-/**
- * Language detection class
- *
- * Requires the langauge model database (lang.dat) that should have
+ * Requires the language model database (lang.dat) that should have
  * accompanied this class definition in order to be instantiated.
  *
  * Example usage:
@@ -60,10 +57,9 @@ require_once 'Text/LanguageDetect/ISO639.php';
  * @package   Text_LanguageDetect
  * @author    Nicholas Pisarro <infinityminusnine+pear@gmail.com>
  * @copyright 2005 Nicholas Pisarro
- * @license   http://www.debian.org/misc/bsd.license BSD
+ * @license   BSD http://www.opensource.org/licenses/bsd-license.php
  * @version   Release: @package_version@
  * @link      http://pear.php.net/package/Text_LanguageDetect/
- * @todo      allow users to generate their own language models
  */
 class Text_LanguageDetect
 {
@@ -110,7 +106,7 @@ class Text_LanguageDetect
     var $_lang_db = array();
 
     /**
-     * stores the map of the trigram data to unicode characters
+     * Stores the map of the trigram data to unicode characters
      *
      * @access private
      * @var    array
@@ -126,9 +122,9 @@ class Text_LanguageDetect
     var $_threshold = 300;
 
     /**
-     * the maximum possible score.
+     * The maximum possible score.
      *
-     * needed for score normalization. Different depending on the
+     * Needed for score normalization. Different depending on the
      * perl compatibility setting
      *
      * @access private
@@ -155,7 +151,7 @@ class Text_LanguageDetect
     var $_use_unicode_narrowing = true;
 
     /**
-     * stores the result of the clustering operation
+     * Stores the result of the clustering operation
      *
      * @access private
      * @var    array
@@ -518,7 +514,7 @@ class Text_LanguageDetect
     /**
      * Sorts an array by value breaking ties alphabetically
      *
-     * @param array &$arr the array to sort
+     * @param array $arr the array to sort
      *
      * @return void
      * @access private
@@ -1465,7 +1461,7 @@ class Text_LanguageDetect
     }
 
     /**
-     * ut8-safe strlen()
+     * UTF8-safe strlen()
      *
      * Returns the numbers of characters (not bytes) in a utf8 string
      *
@@ -1529,14 +1525,14 @@ class Text_LanguageDetect
     }
 
     /**
-     * utf8-safe fast character iterator
+     * UTF8-safe fast character iterator
      *
      * Will get the next character starting from $counter, which will then be
      * incremented. If a multi-byte char the bytes will be concatenated and
      * $counter will be incremeted by the number of bytes in the char.
      *
      * @param string $str             the string being iterated over
-     * @param int    &$counter        the iterator, will increment by reference
+     * @param int    $counter         the iterator, will increment by reference
      * @param bool   $special_convert whether to do special conversions
      *
      * @return char the next (possibly multi-byte) char from $counter
