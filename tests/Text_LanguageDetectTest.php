@@ -10,6 +10,7 @@ set_include_path(
 error_reporting(E_ALL|E_STRICT);
 
 require_once 'Text/LanguageDetect.php';
+require_once __DIR__ . '/PrivProxy.php';
 
 class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
@@ -17,6 +18,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         ini_set('magic_quotes_runtime', 0);
         $this->x = new Text_LanguageDetect();
+        $this->xproxy = new PrivProxy($this->x);
     }
 
     function tearDown ()
@@ -28,16 +30,16 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         $this->assertEquals(
             '/path/to/file',
-            $this->x->_get_data_loc('/path/to/file')
+            $this->xproxy->_get_data_loc('/path/to/file')
         );
     }
 
     function test_get_data_locPearPath()
     {
-        $this->x->_data_dir = '/path/to/pear/data';
+        $this->xproxy->_data_dir = '/path/to/pear/data';
         $this->assertEquals(
             '/path/to/pear/data/Text_LanguageDetect/file',
-            $this->x->_get_data_loc('file')
+            $this->xproxy->_get_data_loc('file')
         );
     }
 
@@ -47,7 +49,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
      */
     function test_readdbNonexistingFile()
     {
-        $this->x->_readdb('thisfiledoesnotexist');
+        $this->xproxy->_readdb('thisfiledoesnotexist');
     }
 
     /**
@@ -58,7 +60,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         $name = tempnam(sys_get_temp_dir(), 'unittest-Text_LanguageDetect-');
         chmod($name, 0000);
-        $this->x->_readdb($name);
+        $this->xproxy->_readdb($name);
     }
 
     /**
@@ -67,7 +69,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
      */
     function test_checkTrigramEmpty()
     {
-        $this->x->_checkTrigram(array());
+        $this->xproxy->_checkTrigram(array());
     }
 
     /**
@@ -76,7 +78,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
      */
     function test_checkTrigramNoArray()
     {
-        $this->x->_checkTrigram('foo');
+        $this->xproxy->_checkTrigram('foo');
     }
 
     /**
@@ -89,26 +91,26 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             $this->markTestSkipped('5.4.0 has no magic quotes anymore');
         }
         ini_set('magic_quotes_runtime', 1);
-        $this->x->_checkTrigram('foo');
+        $this->xproxy->_checkTrigram('foo');
     }
 
     function test_splitter ()
     {
         $str = 'hello';
 
-        $result = $this->x->_trigram($str);
+        $result = $this->xproxy->_trigram($str);
 
         $this->assertEquals(array(' he' => 1, 'hel' => 1, 'ell' => 1, 'llo' => 1, 'lo ' => 1), $result);
 
         $str = 'aa aa whatever';
 
-        $result = $this->x->_trigram($str);
+        $result = $this->xproxy->_trigram($str);
         $this->assertEquals(2, $result[' aa']);
         $this->assertEquals(2, $result['aa ']);
         $this->assertEquals(1, $result['a a']);
 
         $str = 'aa  aa';
-        $result = $this->x->_trigram($str);
+        $result = $this->xproxy->_trigram($str);
         $this->assertArrayNotHasKey('  a', $result, '  a');
         $this->assertArrayNotHasKey('a  ', $result, 'a  ');
     }
@@ -117,7 +119,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         $str = 'resumé';
  
-        $result = $this->x->_trigram($str);
+        $result = $this->xproxy->_trigram($str);
  
         $this->assertTrue(isset($result['mé ']), 'mé ');
         $this->assertTrue(isset($result['umé']), 'umé');
@@ -126,7 +128,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         // tests lower-casing accented characters
         $str = 'resumÉ';
         
-        $result = $this->x->_trigram($str);
+        $result = $this->xproxy->_trigram($str);
  
         $this->assertTrue(isset($result['mé ']),'mé ');
         $this->assertTrue(isset($result['umé']),'umé');
@@ -136,7 +138,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     function test_sort ()
     {
         $arr = array('a' => 1, 'b' => 2, 'c' => 2);
-        $this->x->_bub_sort($arr);
+        $this->xproxy->__call('_bub_sort',[&$arr]);
 
         $final_arr = array('b' => 2, 'c' => 2, 'a' => 1);
 
@@ -174,8 +176,9 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $str = 'This function may return Boolean FALSE, but may also return a non-Boolean value which evaluates to FALSE, such as 0 or "". Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.';
 
         $myobj = new Text_LanguageDetect;
+        $myobjproxy = new PrivProxy($myobj);
 
-        $myobj->_use_unicode_narrowing = false;
+        $myobjproxy->_use_unicode_narrowing = false;
 
         $count = $myobj->getLanguageCount();
         $returnval = $myobj->omitLanguages('english');
@@ -227,23 +230,22 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     function testOmitLanguagesClearsClusterCache()
     {
         $this->x->omitLanguages(array('english', 'german'), true);
-        $this->assertNull($this->x->_clusters);
+        $this->assertNull($this->xproxy->_clusters);
         $this->x->clusterLanguages();
-        $this->assertNotNull($this->x->_clusters);
+        $this->assertNotNull($this->xproxy->_clusters);
         $this->x->omitLanguages('german');
-        $this->assertNull($this->x->_clusters, 'cluster cache be empty now');
+        $this->assertNull($this->xproxy->_clusters, 'cluster cache be empty now');
     }
 
     function test_perl_compatibility()
     {
         // if this test fails, then many of the others will
 
-        $myobj = new Text_LanguageDetect;
-        $myobj->setPerlCompatible(true);
+        $this->x->setPerlCompatible(true);
 
         $testtext = "hello";
 
-        $result = $myobj->_trigram($testtext);
+        $result = $this->xproxy->_trigram($testtext);
 
         $this->assertTrue(!isset($result[' he']));
     }
@@ -315,7 +317,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         );
 
 
-        $my_arr = $this->x->_lang_db['french'];
+        $my_arr = $this->xproxy->_lang_db['french'];
 
         foreach ($safe_model as $key => $value) {
             $this->assertTrue(isset($my_arr[$key]),$key);
@@ -391,7 +393,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             "ess" => 295,     "ie " => 296,     "ist" => 297,     "lat" => 298,     "uri" => 299,
         );
 
-        $mod = $this->x->_lang_db['english'];
+        $mod = $this->xproxy->_lang_db['english'];
 
         foreach ($realdb as $key => $value) {
             $this->assertTrue(isset($mod[$key]), $key);
@@ -431,7 +433,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $str = 'The Italian Renaissance began the opening phase of the Renaissance, a period of great cultural change and achievement from the 14th to the 16th century. The word renaissance means "rebirth," and the era is best known for the renewed interest in the culture of classical antiquity. The Italian Renaissance began in northern Italy, centering in Florence. It then spread south, having an especially significant impact on Rome, which was largely rebuilt by the Renaissance popes. The Italian Renaissance is best known for its cultural achievements. This includes works of literature by such figures as Petrarch, Castiglione, and Machiavelli; artists such as Michaelangelo and Leonardo da Vinci, and great works of architecture such as The Duomo in Florence and St. Peter\'s Basilica in Rome. At the same time, present-day historians also see the era as one of economic regression and of little progress in science. Furthermore, some historians argue that the lot of the peasants and urban poor, the majority of the population, worsened during this period.';
     
         $this->x->setPerlCompatible();
-        $tri = $this->x->_trigram($str);
+        $tri = $this->xproxy->_trigram($str);
         
         $exp_tri = array(
             ' th',
@@ -955,7 +957,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         //print_r(array_diff(array_keys($tri), $exp_tri));
 
         // tests the bubble sort mechanism
-        $this->x->_bub_sort($tri);
+        $this->xproxy->__call('_bub_sort', [&$tri]);
         $this->assertEquals($exp_tri, array_keys($tri));
 
         $true_differences = array(
@@ -1111,16 +1113,16 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             " wh" => array('change' => 195, 'baserank' => 232, 'refrank' => 37),      " ph" => array('change' => 300, 'baserank' => 220, 'refrank' => null),
         );
         
-        $ranked = $this->x->_arr_rank($this->x->_trigram($str));
+        $ranked = $this->xproxy->_arr_rank($this->xproxy->_trigram($str));
         $results = $this->x->detect($str);
 
         $count = count($ranked);
         $sum = 0;
 
-        //foreach ($this->x->_lang_db['english'] as $key => $value) {
+        //foreach ($this->xproxy->_lang_db['english'] as $key => $value) {
         foreach ($ranked as $key => $value) {
-            if (isset($ranked[$key]) && isset($this->x->_lang_db['english'][$key])) {
-                $difference = abs($this->x->_lang_db['english'][$key] - $ranked[$key]);
+            if (isset($ranked[$key]) && isset($this->xproxy->_lang_db['english'][$key])) {
+                $difference = abs($this->xproxy->_lang_db['english'][$key] - $ranked[$key]);
             } else {
                 $difference = 300;
             }
@@ -1147,11 +1149,11 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->x->setPerlCompatible();
         $str = "Verifions que le détecteur de langues marche";
 
-        $trigrams = $this->x->_trigram($str);
+        $trigrams = $this->xproxy->_trigram($str);
         $this->assertEquals(42, count($trigrams));
         // verified in Language::Guess
 
-        $ranked = $this->x->_arr_rank($trigrams);
+        $ranked = $this->xproxy->_arr_rank($trigrams);
         $this->assertEquals(0, $ranked['e l']);
 
         $correct_ranks = array(
@@ -1249,7 +1251,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
 
 
-        $french_ranks = $this->x->_lang_db['french'];
+        $french_ranks = $this->xproxy->_lang_db['french'];
 
         $sumchange = 0;
         foreach ($ranked as $key => $value) {
@@ -1272,7 +1274,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             $sumchange += $difference;
         }
 
-        $actual_result = $this->x->_distance($french_ranks, $ranked);
+        $actual_result = $this->xproxy->_distance($french_ranks, $ranked);
         $this->assertEquals($sumchange, $actual_result);
         $this->assertEquals(7091, $actual_result);
         $this->assertEquals(168, floor($sumchange/count($trigrams)));
@@ -1287,8 +1289,8 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $str = 'авай проверить  узнает ли наш угадатель русски язык';
 
         $this->x->setPerlCompatible();
-        $trigrams = $this->x->_trigram($str);
-        $ranked = $this->x->_arr_rank($trigrams);
+        $trigrams = $this->xproxy->_trigram($str);
+        $ranked = $this->xproxy->_arr_rank($trigrams);
 
         $correct_ranks = array(
             ' ру' => array('change' => 300, 'baserank' => 3, 'refrank' => null),
@@ -1344,7 +1346,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(48, count($ranked));
 
 
-        $russian = $this->x->_lang_db['russian'];
+        $russian = $this->xproxy->_lang_db['russian'];
 
         $sumchange = 0;
         foreach ($ranked as $key => $value) {
@@ -1367,7 +1369,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             $sumchange += $difference;
         }
 
-        $actual_result = $this->x->_distance($russian, $ranked);
+        $actual_result = $this->xproxy->_distance($russian, $ranked);
         $this->assertEquals($sumchange, $actual_result);
         $this->assertEquals(10428, $actual_result);
         $this->assertEquals(217, floor($sumchange/count($trigrams)));
@@ -1380,7 +1382,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         $str = 'is it s i';
 
-        $result = $this->x->_arr_rank($this->x->_trigram($str));
+        $result = $this->xproxy->_arr_rank($this->xproxy->_trigram($str));
 
         $this->assertEquals(0, $result['s i']);
     }
@@ -1620,9 +1622,11 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $i = 0;
         $j = 0;
         $new_u = '';
+        $rm = new ReflectionMethod('Text_LanguageDetect', '_next_char');
+        $rm->setAccessible(true);
         while ($i < strlen($uppercased)) {
-            $u = Text_LanguageDetect::_next_char($uppercased, $i, true);
-            $l = Text_LanguageDetect::_next_char($lowercased, $j, true);
+            $u = $rm->invokeArgs($this->x, [$uppercased, &$i, true]);
+            $l = $rm->invokeArgs($this->x, [$lowercased, &$j, true]);
             $this->assertEquals($u, $l);
 
             $new_u .= $u;
@@ -1776,7 +1780,7 @@ EOF;
         
 
         foreach ($chars as $utf8 => $unicode) {
-            $this->assertEquals($unicode, $this->x->_utf8char2unicode($utf8), $utf8);
+            $this->assertEquals($unicode, $this->xproxy->_utf8char2unicode($utf8), $utf8);
         }
     }
 
@@ -1921,7 +1925,7 @@ EOF;
     {
         $this->assertEquals(
             'english',
-            $this->x->_convertFromNameMode('english')
+            $this->xproxy->_convertFromNameMode('english')
         );
     }
 
@@ -1930,7 +1934,7 @@ EOF;
         $this->x->setNameMode(2);
         $this->assertEquals(
             'english',
-            $this->x->_convertFromNameMode('en')
+            $this->xproxy->_convertFromNameMode('en')
         );
     }
 
@@ -1939,7 +1943,7 @@ EOF;
         $this->x->setNameMode(3);
         $this->assertEquals(
             'english',
-            $this->x->_convertFromNameMode('eng')
+            $this->xproxy->_convertFromNameMode('eng')
         );
     }
 
@@ -1948,7 +1952,7 @@ EOF;
         $this->x->setNameMode(2);
         $this->assertEquals(
             array('english', 'german'),
-            $this->x->_convertFromNameMode(array('en', 'de'))
+            $this->xproxy->_convertFromNameMode(array('en', 'de'))
         );
     }
 
@@ -1957,7 +1961,7 @@ EOF;
         $this->x->setNameMode(2);
         $this->assertEquals(
             array('english' => 'foo', 'german' => 'test'),
-            $this->x->_convertFromNameMode(
+            $this->xproxy->_convertFromNameMode(
                 array('en' => 'foo', 'de' => 'test'),
                 true
             )
@@ -1969,7 +1973,7 @@ EOF;
         $this->x->setNameMode(3);
         $this->assertEquals(
             array('english', 'german'),
-            $this->x->_convertFromNameMode(array('eng', 'deu'))
+            $this->xproxy->_convertFromNameMode(array('eng', 'deu'))
         );
     }
 
@@ -1978,7 +1982,7 @@ EOF;
         $this->x->setNameMode(3);
         $this->assertEquals(
             array('english' => 'foo', 'german' => 'test'),
-            $this->x->_convertFromNameMode(
+            $this->xproxy->_convertFromNameMode(
                 array('eng' => 'foo', 'deu' => 'test'),
                 true
             )
@@ -1989,7 +1993,7 @@ EOF;
     {
         $this->assertEquals(
             'english',
-            $this->x->_convertToNameMode('english')
+            $this->xproxy->_convertToNameMode('english')
         );
     }
 
@@ -1998,7 +2002,7 @@ EOF;
         $this->x->setNameMode(2);
         $this->assertEquals(
             'en',
-            $this->x->_convertToNameMode('english')
+            $this->xproxy->_convertToNameMode('english')
         );
     }
 
@@ -2007,7 +2011,7 @@ EOF;
         $this->x->setNameMode(3);
         $this->assertEquals(
             'eng',
-            $this->x->_convertToNameMode('english')
+            $this->xproxy->_convertToNameMode('english')
         );
     }
 
@@ -2016,7 +2020,7 @@ EOF;
         $this->x->setNameMode(2);
         $this->assertEquals(
             array('en', 'de'),
-            $this->x->_convertToNameMode(array('english', 'german'))
+            $this->xproxy->_convertToNameMode(array('english', 'german'))
         );
     }
 
@@ -2025,7 +2029,7 @@ EOF;
         $this->x->setNameMode(2);
         $this->assertEquals(
             array('en' => 'foo', 'de' => 'test'),
-            $this->x->_convertToNameMode(
+            $this->xproxy->_convertToNameMode(
                 array('english' => 'foo', 'german' => 'test'),
                 true
             )
@@ -2037,7 +2041,7 @@ EOF;
         $this->x->setNameMode(3);
         $this->assertEquals(
             array('eng', 'deu'),
-            $this->x->_convertToNameMode(array('english', 'german'))
+            $this->xproxy->_convertToNameMode(array('english', 'german'))
         );
     }
 
@@ -2046,7 +2050,7 @@ EOF;
         $this->x->setNameMode(3);
         $this->assertEquals(
             array('eng' => 'foo', 'deu' => 'test'),
-            $this->x->_convertToNameMode(
+            $this->xproxy->_convertToNameMode(
                 array('english' => 'foo', 'german' => 'test'),
                 true
             )
