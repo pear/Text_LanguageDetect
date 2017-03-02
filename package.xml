@@ -16,38 +16,44 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <active>no</active>
  </lead>
 
- <date>2012-01-16</date>
- <time>10:00:23</time>
+ <date>2017-03-02</date>
+ <time>18:00:42</time>
  <version>
-  <release>0.3.0</release>
-  <api>0.3.0</api>
+  <release>1.0.0</release>
+  <api>1.0.0</api>
  </version>
 
  <stability>
-  <release>alpha</release>
-  <api>alpha</api>
+  <release>stable</release>
+  <api>stable</api>
  </stability>
 
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
 
  <notes>
-- BC break: Return lowercase language names
-- BC break: Use exceptions instead of PEAR_Error
-- Implement request #19221: Return ISO 639-1 or ISO 639-2 language codes
+  - Add PHP5 constructors
+  - Fix bug #21189: Language detection on PHP7 broken
+  - Fix coding style problems
+  - BC break: Add real visibility to properties and methods
  </notes>
 
  <contents>
   <dir name="/">
+   <file name="README.rst" role="doc" />
    <dir name="data">
     <file name="lang.dat" role="data" />
     <file name="unicode_blocks.dat" role="data" />
    </dir> <!-- /data -->
    <dir name="docs">
+    <file name="confidence.php" role="doc" />
     <file name="example_clui.php" role="doc" />
     <file name="example_web.php" role="doc" />
     <file name="iso.php" role="doc" />
+    <file name="languages.php" role="doc" />
+    <file name="simple.php" role="doc" />
    </dir> <!-- /docs -->
    <dir name="tests">
+    <file name="PrivProxy.php" role="test" />
     <file name="Text_LanguageDetectTest.php" role="test" />
     <file name="Text_LanguageDetect_ISO639Test.php" role="test" />
    </dir> <!-- /tests -->
@@ -74,7 +80,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <dependencies>
   <required>
    <php>
-    <min>5.3</min>
+    <min>5.4</min>
    </php>
    <pearinstaller>
     <min>1.9.0</min>
@@ -98,6 +104,25 @@ http://pear.php.net/dtd/package-2.0.xsd">
  </phprelease>
 
  <changelog>
+
+  <release>
+   <version>
+    <release>1.0.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2017-03-02</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+    - Add PHP5 constructors
+    - Fix bug #21189: Language detection on PHP7 broken
+    - Fix coding style problems
+    - BC break: Add real visibility to properties and methods
+   </notes>
+  </release>
 
   <release>
    <version>
