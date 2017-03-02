@@ -35,75 +35,65 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
     /**
      * The piece of text being parsed
      *
-     * @access private
-     * @var    string
+     * @var string
      */
-    var $_string;
+    protected $_string;
 
     /**
      * Stores the trigram frequencies of the sample
      *
-     * @access private
-     * @var    string
+     * @var string
      */
-    var $_trigrams = array();
+    protected $_trigrams = array();
 
     /**
      * Stores the trigram ranks of the sample
      *
-     * @access private
-     * @var    array
+     * @var array
      */
-    var $_trigram_ranks = array();
+    protected $_trigram_ranks = array();
 
     /**
      * Stores the unicode blocks of the sample
      *
-     * @access private
-     * @var    array
+     * @var array
      */
-    var $_unicode_blocks = array();
+    protected $_unicode_blocks = array();
 
     /**
      * Whether the parser should compile the unicode ranges
      *
-     * @access private
-     * @var    bool
+     * @var bool
      */
-    var $_compile_unicode = false;
+    protected $_compile_unicode = false;
 
     /**
      * Whether the parser should compile trigrams
      *
-     * @access private
-     * @var    bool
+     * @var bool
      */
-    var $_compile_trigram = false;
+    protected $_compile_trigram = false;
 
     /**
      * Whether the trigram parser should pad the beginning of the string
      *
-     * @access private
-     * @var    bool
+     * @var bool
      */
-    var $_trigram_pad_start = false;
+    protected $_trigram_pad_start = false;
 
     /**
      * Whether the unicode parser should skip non-alphabetical ascii chars
      *
-     * @access private
-     * @var    bool
+     * @var bool
      */
-    var $_unicode_skip_symbols = true;
+    protected $_unicode_skip_symbols = true;
 
     /**
      * Constructor
      *
      * @param string $string string to be parsed
-     *
-     * @access private
      */
-    function __construct($string)
+    public function __construct($string)
     {
         $this->_string = $string;
     }
@@ -114,9 +104,8 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
      * @param string $string string to be parsed
      *
      * @return void
-     * @access private
      */
-    function Text_LanguageDetect_Parser($string)
+    public function Text_LanguageDetect_Parser($string)
     {
         self::__construct($string);
     }
