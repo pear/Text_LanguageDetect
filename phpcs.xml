@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="PEAR-StreamVar">
+<ruleset name="PEAR-textlanguagedetect">
  <rule ref="PEAR">
   <!-- we keep the old php4-style variable names for now -->
   <exclude name="PEAR.NamingConventions.ValidFunctionName.PublicUnderscore"/>
