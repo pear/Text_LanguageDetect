@@ -155,3 +155,12 @@ Unit test status
 
   .. image:: https://travis-ci.org/pear/Text_LanguageDetect.svg?branch=master
      :target: https://travis-ci.org/pear/Text_LanguageDetect
+
+
+Notes
+=====
+Where are the data from?
+
+ I don't recall where I got the original data set.
+ It's just the frequencies of 3-letter combinations in each supported language.
+ It could be generated from a few random wikipedia pages from each language.
