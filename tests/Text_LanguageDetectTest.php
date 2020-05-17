@@ -1445,7 +1445,8 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->assertInternalType('array', $scores);
         $this->assertGreaterThan(5, count($scores));
 
-        list($key, $value) = each($scores);
+        reset($scores);
+        $key = key($scores);
         $this->assertEquals('german', $key, 'text is german');
     }
 
@@ -1453,7 +1454,9 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         $this->x->setNameMode(2);
         $scores = $this->x->detect('Das ist ein kleiner Text für euch alle');
-        list($key, $value) = each($scores);
+
+        reset($scores);
+        $key = key($scores);
         $this->assertEquals('de', $key, 'text is german');
     }
 
@@ -1461,7 +1464,9 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
         $this->x->setNameMode(2);
         $scores = $this->x->detect('Das ist ein kleiner Text für euch alle', 1);
-        list($key, $value) = each($scores);
+
+        reset($scores);
+        $key = key($scores);
         $this->assertEquals('de', $key, 'text is german');
     }
 

@@ -189,7 +189,7 @@ class Text_LanguageDetect
      */
     protected function _get_data_loc($fname)
     {
-        if ($fname{0} == '/' || $fname{0} == '.') {
+        if ($fname[0] == '/' || $fname[0] == '.') {
             // if filename starts with a slash, assume it's an absolute pathname
             // and skip whatever is in $this->_data_dir
             return $fname;
@@ -1470,31 +1470,31 @@ class Text_LanguageDetect
         case 1:
             // normal ASCII-7 byte
             // 0xxxxxxx -->  0xxxxxxx
-            return ord($char{0});
+            return ord($char[0]);
 
         case 2:
             // 2 byte unicode
             // 110zzzzx 10xxxxxx --> 00000zzz zxxxxxxx
-            $z = (ord($char{0}) & 0x000001F) << 6;
-            $x = (ord($char{1}) & 0x0000003F);
+            $z = (ord($char[0]) & 0x000001F) << 6;
+            $x = (ord($char[1]) & 0x0000003F);
             return ($z | $x);
 
         case 3:
             // 3 byte unicode
             // 1110zzzz 10zxxxxx 10xxxxxx --> zzzzzxxx xxxxxxxx
-            $z =  (ord($char{0}) & 0x0000000F) << 12;
-            $x1 = (ord($char{1}) & 0x0000003F) << 6;
-            $x2 = (ord($char{2}) & 0x0000003F);
+            $z =  (ord($char[0]) & 0x0000000F) << 12;
+            $x1 = (ord($char[1]) & 0x0000003F) << 6;
+            $x2 = (ord($char[2]) & 0x0000003F);
             return ($z | $x1 | $x2);
 
         case 4:
             // 4 byte unicode
             // 11110zzz 10zzxxxx 10xxxxxx 10xxxxxx -->
             // 000zzzzz xxxxxxxx xxxxxxxx
-            $z1 = (ord($char{0}) & 0x00000007) << 18;
-            $z2 = (ord($char{1}) & 0x0000003F) << 12;
-            $x1 = (ord($char{2}) & 0x0000003F) << 6;
-            $x2 = (ord($char{3}) & 0x0000003F);
+            $z1 = (ord($char[0]) & 0x00000007) << 18;
+            $z2 = (ord($char[1]) & 0x0000003F) << 12;
+            $x1 = (ord($char[2]) & 0x0000003F) << 6;
+            $x2 = (ord($char[3]) & 0x0000003F);
             return ($z1 | $z2 | $x1 | $x2);
         }
     }
@@ -1514,7 +1514,7 @@ class Text_LanguageDetect
      */
     protected static function _next_char($str, &$counter, $special_convert = false)
     {
-        $char = $str{$counter++};
+        $char = $str[$counter++];
         $ord = ord($char);
 
         // for a description of the utf8 system see
@@ -1538,7 +1538,7 @@ class Text_LanguageDetect
 
         } elseif ($ord >> 5 == 6) { // two-byte char
             // multi-byte chars
-            $nextchar = $str{$counter++}; // get next byte
+            $nextchar = $str[$counter++]; // get next byte
 
             // lower-casing of non-ascii characters is still incomplete
 
@@ -1580,12 +1580,12 @@ class Text_LanguageDetect
         } elseif ($ord >> 4  == 14) { // three-byte char
 
             // tag on next 2 bytes
-            return $char . $str{$counter++} . $str{$counter++};
+            return $char . $str[$counter++] . $str[$counter++];
 
         } elseif ($ord >> 3 == 30) { // four-byte char
 
             // tag on next 3 bytes
-            return $char . $str{$counter++} . $str{$counter++} . $str{$counter++};
+            return $char . $str[$counter++] . $str[$counter++] . $str[$counter++];
 
         } else {
             // error?
