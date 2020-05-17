@@ -247,12 +247,6 @@ class Text_LanguageDetect
     protected function _checkTrigram($trigram)
     {
         if (!is_array($trigram)) {
-            if (ini_get('magic_quotes_runtime')) {
-                throw new Text_LanguageDetect_Exception(
-                    'Error loading database. Try turning magic_quotes_runtime off.',
-                    Text_LanguageDetect_Exception::MAGIC_QUOTES
-                );
-            }
             throw new Text_LanguageDetect_Exception(
                 'Language database is not an array.',
                 Text_LanguageDetect_Exception::DB_NOT_ARRAY

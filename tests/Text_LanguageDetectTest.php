@@ -16,7 +16,6 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
     function setup ()
     {
-        ini_set('magic_quotes_runtime', 0);
         $this->x = new Text_LanguageDetect();
         $this->xproxy = new PrivProxy($this->x);
     }
@@ -78,19 +77,6 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
      */
     function test_checkTrigramNoArray()
     {
-        $this->xproxy->_checkTrigram('foo');
-    }
-
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Error loading database. Try turning magic_quotes_runtime off
-     */
-    function test_checkTrigramNoArrayMagicQuotes()
-    {
-        if (version_compare(PHP_VERSION, '5.4.0-dev') >= 0) {
-            $this->markTestSkipped('5.4.0 has no magic quotes anymore');
-        }
-        ini_set('magic_quotes_runtime', 1);
         $this->xproxy->_checkTrigram('foo');
     }
 
