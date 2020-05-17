@@ -14,13 +14,13 @@ require_once __DIR__ . '/PrivProxy.php';
 
 class Text_LanguageDetectTest extends \PHPUnit\Framework\TestCase {
 
-    function setUp()
+    function setUp(): void
     {
         $this->x = new Text_LanguageDetect();
         $this->xproxy = new PrivProxy($this->x);
     }
 
-    function tearDown ()
+    function tearDown(): void
     {
         unset($this->x);
     }
