@@ -5,7 +5,7 @@ set_include_path(
 
 require_once 'Text/LanguageDetect/ISO639.php';
 
-class Text_LanguageDetect_ISO639Test extends PHPUnit_Framework_TestCase
+class Text_LanguageDetect_ISO639Test extends PHPUnit\Framework\TestCase
 {
     public function testNameToCode2()
     {

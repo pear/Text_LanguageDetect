@@ -12,9 +12,9 @@ error_reporting(E_ALL|E_STRICT);
 require_once 'Text/LanguageDetect.php';
 require_once __DIR__ . '/PrivProxy.php';
 
-class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
+class Text_LanguageDetectTest extends \PHPUnit\Framework\TestCase {
 
-    function setup ()
+    function setUp()
     {
         $this->x = new Text_LanguageDetect();
         $this->xproxy = new PrivProxy($this->x);
