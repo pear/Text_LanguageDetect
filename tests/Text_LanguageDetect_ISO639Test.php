@@ -5,12 +5,12 @@ set_include_path(
 
 require_once 'Text/LanguageDetect/ISO639.php';
 
-class Text_LanguageDetect_ISO639Test extends PHPUnit_Framework_TestCase
+class Text_LanguageDetect_ISO639Test extends PHPUnit\Framework\TestCase
 {
     public function testNameToCode2()
     {
         $this->assertEquals(
-            'de', 
+            'de',
             Text_LanguageDetect_ISO639::nameToCode2('german')
         );
     }
@@ -25,7 +25,7 @@ class Text_LanguageDetect_ISO639Test extends PHPUnit_Framework_TestCase
     public function testNameToCode3()
     {
         $this->assertEquals(
-            'fra', 
+            'fra',
             Text_LanguageDetect_ISO639::nameToCode3('french')
         );
     }
@@ -40,7 +40,7 @@ class Text_LanguageDetect_ISO639Test extends PHPUnit_Framework_TestCase
     public function testCode2ToName()
     {
         $this->assertEquals(
-            'english', 
+            'english',
             Text_LanguageDetect_ISO639::code2ToName('en')
         );
     }
@@ -55,7 +55,7 @@ class Text_LanguageDetect_ISO639Test extends PHPUnit_Framework_TestCase
     public function testCode3ToName()
     {
         $this->assertEquals(
-            'romanian', 
+            'romanian',
             Text_LanguageDetect_ISO639::code3ToName('rom')
         );
     }
