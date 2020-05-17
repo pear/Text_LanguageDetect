@@ -118,18 +118,18 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     function test_splitter2 ()
     {
         $str = 'resumé';
- 
+
         $result = $this->xproxy->_trigram($str);
- 
+
         $this->assertTrue(isset($result['mé ']), 'mé ');
         $this->assertTrue(isset($result['umé']), 'umé');
         $this->assertTrue(!isset($result['é  ']), 'é');
 
         // tests lower-casing accented characters
         $str = 'resumÉ';
-        
+
         $result = $this->xproxy->_trigram($str);
- 
+
         $this->assertTrue(isset($result['mé ']),'mé ');
         $this->assertTrue(isset($result['umé']),'umé');
         $this->assertTrue(!isset($result['é  ']),'é');
@@ -254,65 +254,65 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
 
         $safe_model = array(
-            "es " => 0,     " de" => 1,     "de " => 2,     " le" => 3,     "ent" => 4,     
-            "le " => 5,     "nt " => 6,     "la " => 7,     "s d" => 8,     " la" => 9,     
-            "ion" => 10,     "on " => 11,     "re " => 12,     " pa" => 13,     "e l" => 14,     
-            "e d" => 15,     " l'" => 16,     "e p" => 17,     " co" => 18,     " pr" => 19,     
-            "tio" => 20,     "ns " => 21,     " en" => 22,     "ne " => 23,     "que" => 24,     
-            "r l" => 25,     "les" => 26,     "ur " => 27,     "en " => 28,     "ati" => 29,     
-            "ue " => 30,     " po" => 31,     " d'" => 32,     "par" => 33,     " a " => 34,     
-            "et " => 35,     "it " => 36,     " qu" => 37,     "men" => 38,     "ons" => 39,     
-            "te " => 40,     " et" => 41,     "t d" => 42,     " re" => 43,     "des" => 44,     
-            " un" => 45,     "ie " => 46,     "s l" => 47,     " su" => 48,     "pou" => 49,     
-            " au" => 50,     " à " => 51,     "con" => 52,     "er " => 53,     " no" => 54,     
-            "ait" => 55,     "e c" => 56,     "se " => 57,     "té " => 58,     "du " => 59,     
-            " du" => 60,     " dé" => 61,     "ce " => 62,     "e e" => 63,     "is " => 64,     
-            "n d" => 65,     "s a" => 66,     " so" => 67,     "e r" => 68,     "e s" => 69,     
-            "our" => 70,     "res" => 71,     "ssi" => 72,     "eur" => 73,     " se" => 74,     
-            "eme" => 75,     "est" => 76,     "us " => 77,     "sur" => 78,     "ant" => 79,     
-            "iqu" => 80,     "s p" => 81,     "une" => 82,     "uss" => 83,     "l'a" => 84,     
-            "pro" => 85,     "ter" => 86,     "tre" => 87,     "end" => 88,     "rs " => 89,     
-            " ce" => 90,     "e a" => 91,     "t p" => 92,     "un " => 93,     " ma" => 94,     
-            " ru" => 95,     " ré" => 96,     "ous" => 97,     "ris" => 98,     "rus" => 99,     
-            "sse" => 100,     "ans" => 101,     "ar " => 102,     "com" => 103,     "e m" => 104,     
-            "ire" => 105,     "nce" => 106,     "nte" => 107,     "t l" => 108,     " av" => 109,     
-            " mo" => 110,     " te" => 111,     "il " => 112,     "me " => 113,     "ont" => 114,     
-            "ten" => 115,     "a p" => 116,     "dan" => 117,     "pas" => 118,     "qui" => 119,     
-            "s e" => 120,     "s s" => 121,     " in" => 122,     "ist" => 123,     "lle" => 124,     
-            "nou" => 125,     "pré" => 126,     "'un" => 127,     "air" => 128,     "d'a" => 129,     
-            "ir " => 130,     "n e" => 131,     "rop" => 132,     "ts " => 133,     " da" => 134,     
-            "a s" => 135,     "as " => 136,     "au " => 137,     "den" => 138,     "mai" => 139,     
-            "mis" => 140,     "ori" => 141,     "out" => 142,     "rme" => 143,     "sio" => 144,     
-            "tte" => 145,     "ux " => 146,     "a d" => 147,     "ien" => 148,     "n a" => 149,     
-            "ntr" => 150,     "omm" => 151,     "ort" => 152,     "ouv" => 153,     "s c" => 154,     
-            "son" => 155,     "tes" => 156,     "ver" => 157,     "ère" => 158,     " il" => 159,     
-            " m " => 160,     " sa" => 161,     " ve" => 162,     "a r" => 163,     "ais" => 164,     
-            "ava" => 165,     "di " => 166,     "n p" => 167,     "sti" => 168,     "ven" => 169,     
-            " mi" => 170,     "ain" => 171,     "enc" => 172,     "for" => 173,     "ité" => 174,     
-            "lar" => 175,     "oir" => 176,     "rem" => 177,     "ren" => 178,     "rro" => 179,     
-            "rés" => 180,     "sie" => 181,     "t a" => 182,     "tur" => 183,     " pe" => 184,     
-            " to" => 185,     "d'u" => 186,     "ell" => 187,     "err" => 188,     "ers" => 189,     
-            "ide" => 190,     "ine" => 191,     "iss" => 192,     "mes" => 193,     "por" => 194,     
-            "ran" => 195,     "sit" => 196,     "st " => 197,     "t r" => 198,     "uti" => 199,     
-            "vai" => 200,     "é l" => 201,     "ési" => 202,     " di" => 203,     " n'" => 204,     
-            " ét" => 205,     "a c" => 206,     "ass" => 207,     "e t" => 208,     "in " => 209,     
-            "nde" => 210,     "pre" => 211,     "rat" => 212,     "s m" => 213,     "ste" => 214,     
-            "tai" => 215,     "tch" => 216,     "ui " => 217,     "uro" => 218,     "ès " => 219,     
-            " es" => 220,     " fo" => 221,     " tr" => 222,     "'ad" => 223,     "app" => 224,     
-            "aux" => 225,     "e à" => 226,     "ett" => 227,     "iti" => 228,     "lit" => 229,     
-            "nal" => 230,     "opé" => 231,     "r d" => 232,     "ra " => 233,     "rai" => 234,     
-            "ror" => 235,     "s r" => 236,     "tat" => 237,     "uté" => 238,     "à l" => 239,     
-            " af" => 240,     "anc" => 241,     "ara" => 242,     "art" => 243,     "bre" => 244,     
-            "ché" => 245,     "dre" => 246,     "e f" => 247,     "ens" => 248,     "lem" => 249,     
-            "n r" => 250,     "n t" => 251,     "ndr" => 252,     "nne" => 253,     "onn" => 254,     
-            "pos" => 255,     "s t" => 256,     "tiq" => 257,     "ure" => 258,     " tu" => 259,     
-            "ale" => 260,     "and" => 261,     "ave" => 262,     "cla" => 263,     "cou" => 264,     
-            "e n" => 265,     "emb" => 266,     "ins" => 267,     "jou" => 268,     "mme" => 269,     
-            "rie" => 270,     "rès" => 271,     "sem" => 272,     "str" => 273,     "t i" => 274,     
-            "ues" => 275,     "uni" => 276,     "uve" => 277,     "é d" => 278,     "ée " => 279,     
-            " ch" => 280,     " do" => 281,     " eu" => 282,     " fa" => 283,     " lo" => 284,     
-            " ne" => 285,     " ra" => 286,     "arl" => 287,     "att" => 288,     "ec " => 289,     
-            "ica" => 290,     "l a" => 291,     "l'o" => 292,     "l'é" => 293,     "mmi" => 294,     
+            "es " => 0,     " de" => 1,     "de " => 2,     " le" => 3,     "ent" => 4,
+            "le " => 5,     "nt " => 6,     "la " => 7,     "s d" => 8,     " la" => 9,
+            "ion" => 10,     "on " => 11,     "re " => 12,     " pa" => 13,     "e l" => 14,
+            "e d" => 15,     " l'" => 16,     "e p" => 17,     " co" => 18,     " pr" => 19,
+            "tio" => 20,     "ns " => 21,     " en" => 22,     "ne " => 23,     "que" => 24,
+            "r l" => 25,     "les" => 26,     "ur " => 27,     "en " => 28,     "ati" => 29,
+            "ue " => 30,     " po" => 31,     " d'" => 32,     "par" => 33,     " a " => 34,
+            "et " => 35,     "it " => 36,     " qu" => 37,     "men" => 38,     "ons" => 39,
+            "te " => 40,     " et" => 41,     "t d" => 42,     " re" => 43,     "des" => 44,
+            " un" => 45,     "ie " => 46,     "s l" => 47,     " su" => 48,     "pou" => 49,
+            " au" => 50,     " à " => 51,     "con" => 52,     "er " => 53,     " no" => 54,
+            "ait" => 55,     "e c" => 56,     "se " => 57,     "té " => 58,     "du " => 59,
+            " du" => 60,     " dé" => 61,     "ce " => 62,     "e e" => 63,     "is " => 64,
+            "n d" => 65,     "s a" => 66,     " so" => 67,     "e r" => 68,     "e s" => 69,
+            "our" => 70,     "res" => 71,     "ssi" => 72,     "eur" => 73,     " se" => 74,
+            "eme" => 75,     "est" => 76,     "us " => 77,     "sur" => 78,     "ant" => 79,
+            "iqu" => 80,     "s p" => 81,     "une" => 82,     "uss" => 83,     "l'a" => 84,
+            "pro" => 85,     "ter" => 86,     "tre" => 87,     "end" => 88,     "rs " => 89,
+            " ce" => 90,     "e a" => 91,     "t p" => 92,     "un " => 93,     " ma" => 94,
+            " ru" => 95,     " ré" => 96,     "ous" => 97,     "ris" => 98,     "rus" => 99,
+            "sse" => 100,     "ans" => 101,     "ar " => 102,     "com" => 103,     "e m" => 104,
+            "ire" => 105,     "nce" => 106,     "nte" => 107,     "t l" => 108,     " av" => 109,
+            " mo" => 110,     " te" => 111,     "il " => 112,     "me " => 113,     "ont" => 114,
+            "ten" => 115,     "a p" => 116,     "dan" => 117,     "pas" => 118,     "qui" => 119,
+            "s e" => 120,     "s s" => 121,     " in" => 122,     "ist" => 123,     "lle" => 124,
+            "nou" => 125,     "pré" => 126,     "'un" => 127,     "air" => 128,     "d'a" => 129,
+            "ir " => 130,     "n e" => 131,     "rop" => 132,     "ts " => 133,     " da" => 134,
+            "a s" => 135,     "as " => 136,     "au " => 137,     "den" => 138,     "mai" => 139,
+            "mis" => 140,     "ori" => 141,     "out" => 142,     "rme" => 143,     "sio" => 144,
+            "tte" => 145,     "ux " => 146,     "a d" => 147,     "ien" => 148,     "n a" => 149,
+            "ntr" => 150,     "omm" => 151,     "ort" => 152,     "ouv" => 153,     "s c" => 154,
+            "son" => 155,     "tes" => 156,     "ver" => 157,     "ère" => 158,     " il" => 159,
+            " m " => 160,     " sa" => 161,     " ve" => 162,     "a r" => 163,     "ais" => 164,
+            "ava" => 165,     "di " => 166,     "n p" => 167,     "sti" => 168,     "ven" => 169,
+            " mi" => 170,     "ain" => 171,     "enc" => 172,     "for" => 173,     "ité" => 174,
+            "lar" => 175,     "oir" => 176,     "rem" => 177,     "ren" => 178,     "rro" => 179,
+            "rés" => 180,     "sie" => 181,     "t a" => 182,     "tur" => 183,     " pe" => 184,
+            " to" => 185,     "d'u" => 186,     "ell" => 187,     "err" => 188,     "ers" => 189,
+            "ide" => 190,     "ine" => 191,     "iss" => 192,     "mes" => 193,     "por" => 194,
+            "ran" => 195,     "sit" => 196,     "st " => 197,     "t r" => 198,     "uti" => 199,
+            "vai" => 200,     "é l" => 201,     "ési" => 202,     " di" => 203,     " n'" => 204,
+            " ét" => 205,     "a c" => 206,     "ass" => 207,     "e t" => 208,     "in " => 209,
+            "nde" => 210,     "pre" => 211,     "rat" => 212,     "s m" => 213,     "ste" => 214,
+            "tai" => 215,     "tch" => 216,     "ui " => 217,     "uro" => 218,     "ès " => 219,
+            " es" => 220,     " fo" => 221,     " tr" => 222,     "'ad" => 223,     "app" => 224,
+            "aux" => 225,     "e à" => 226,     "ett" => 227,     "iti" => 228,     "lit" => 229,
+            "nal" => 230,     "opé" => 231,     "r d" => 232,     "ra " => 233,     "rai" => 234,
+            "ror" => 235,     "s r" => 236,     "tat" => 237,     "uté" => 238,     "à l" => 239,
+            " af" => 240,     "anc" => 241,     "ara" => 242,     "art" => 243,     "bre" => 244,
+            "ché" => 245,     "dre" => 246,     "e f" => 247,     "ens" => 248,     "lem" => 249,
+            "n r" => 250,     "n t" => 251,     "ndr" => 252,     "nne" => 253,     "onn" => 254,
+            "pos" => 255,     "s t" => 256,     "tiq" => 257,     "ure" => 258,     " tu" => 259,
+            "ale" => 260,     "and" => 261,     "ave" => 262,     "cla" => 263,     "cou" => 264,
+            "e n" => 265,     "emb" => 266,     "ins" => 267,     "jou" => 268,     "mme" => 269,
+            "rie" => 270,     "rès" => 271,     "sem" => 272,     "str" => 273,     "t i" => 274,
+            "ues" => 275,     "uni" => 276,     "uve" => 277,     "é d" => 278,     "ée " => 279,
+            " ch" => 280,     " do" => 281,     " eu" => 282,     " fa" => 283,     " lo" => 284,
+            " ne" => 285,     " ra" => 286,     "arl" => 287,     "att" => 288,     "ec " => 289,
+            "ica" => 290,     "l a" => 291,     "l'o" => 292,     "l'é" => 293,     "mmi" => 294,
             "nta" => 295,     "orm" => 296,     "ou " => 297,     "r u" => 298,     "rle" => 299
         );
 
@@ -331,65 +331,65 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
 
         $realdb = array(
-            " th" => 0,     "the" => 1,     "he " => 2,     "ed " => 3,     " to" => 4,     
-            " in" => 5,     "er " => 6,     "ing" => 7,     "ng " => 8,     " an" => 9,     
-            "nd " => 10,     " of" => 11,     "and" => 12,     "to " => 13,     "of " => 14,     
-            " co" => 15,     "at " => 16,     "on " => 17,     "in " => 18,     " a " => 19,     
-            "d t" => 20,     " he" => 21,     "e t" => 22,     "ion" => 23,     "es " => 24,     
-            " re" => 25,     "re " => 26,     "hat" => 27,     " sa" => 28,     " st" => 29,     
-            " ha" => 30,     "her" => 31,     "tha" => 32,     "tio" => 33,     "or " => 34,     
-            " ''" => 35,     "en " => 36,     " wh" => 37,     "e s" => 38,     "ent" => 39,     
-            "n t" => 40,     "s a" => 41,     "as " => 42,     "for" => 43,     "is " => 44,     
-            "t t" => 45,     " be" => 46,     "ld " => 47,     "e a" => 48,     "rs " => 49,     
-            " wa" => 50,     "ut " => 51,     "ve " => 52,     "ll " => 53,     "al " => 54,     
-            " ma" => 55,     "e i" => 56,     " fo" => 57,     "'s " => 58,     "an " => 59,     
-            "est" => 60,     " hi" => 61,     " mo" => 62,     " se" => 63,     " pr" => 64,     
-            "s t" => 65,     "ate" => 66,     "st " => 67,     "ter" => 68,     "ere" => 69,     
-            "ted" => 70,     "nt " => 71,     "ver" => 72,     "d a" => 73,     " wi" => 74,     
-            "se " => 75,     "e c" => 76,     "ect" => 77,     "ns " => 78,     " on" => 79,     
-            "ly " => 80,     "tol" => 81,     "ey " => 82,     "r t" => 83,     " ca" => 84,     
-            "ati" => 85,     "ts " => 86,     "all" => 87,     " no" => 88,     "his" => 89,     
-            "s o" => 90,     "ers" => 91,     "con" => 92,     "e o" => 93,     "ear" => 94,     
-            "f t" => 95,     "e w" => 96,     "was" => 97,     "ons" => 98,     "sta" => 99,     
-            "'' " => 100,     "sti" => 101,     "n a" => 102,     "sto" => 103,     "t h" => 104,     
-            " we" => 105,     "id " => 106,     "th " => 107,     " it" => 108,     "ce " => 109,     
-            " di" => 110,     "ave" => 111,     "d h" => 112,     "cou" => 113,     "pro" => 114,     
-            "ad " => 115,     "oll" => 116,     "ry " => 117,     "d s" => 118,     "e m" => 119,     
-            " so" => 120,     "ill" => 121,     "cti" => 122,     "te " => 123,     "tor" => 124,     
-            "eve" => 125,     "g t" => 126,     "it " => 127,     " ch" => 128,     " de" => 129,     
-            "hav" => 130,     "oul" => 131,     "ty " => 132,     "uld" => 133,     "use" => 134,     
-            " al" => 135,     "are" => 136,     "ch " => 137,     "me " => 138,     "out" => 139,     
-            "ove" => 140,     "wit" => 141,     "ys " => 142,     "chi" => 143,     "t a" => 144,     
-            "ith" => 145,     "oth" => 146,     " ab" => 147,     " te" => 148,     " wo" => 149,     
-            "s s" => 150,     "res" => 151,     "t w" => 152,     "tin" => 153,     "e b" => 154,     
-            "e h" => 155,     "nce" => 156,     "t s" => 157,     "y t" => 158,     "e p" => 159,     
-            "ele" => 160,     "hin" => 161,     "s i" => 162,     "nte" => 163,     " li" => 164,     
-            "le " => 165,     " do" => 166,     "aid" => 167,     "hey" => 168,     "ne " => 169,     
-            "s w" => 170,     " as" => 171,     " fr" => 172,     " tr" => 173,     "end" => 174,     
-            "sai" => 175,     " el" => 176,     " ne" => 177,     " su" => 178,     "'t " => 179,     
-            "ay " => 180,     "hou" => 181,     "ive" => 182,     "lec" => 183,     "n't" => 184,     
-            " ye" => 185,     "but" => 186,     "d o" => 187,     "o t" => 188,     "y o" => 189,     
-            " ho" => 190,     " me" => 191,     "be " => 192,     "cal" => 193,     "e e" => 194,     
-            "had" => 195,     "ple" => 196,     " at" => 197,     " bu" => 198,     " la" => 199,     
-            "d b" => 200,     "s h" => 201,     "say" => 202,     "t i" => 203,     " ar" => 204,     
-            "e f" => 205,     "ght" => 206,     "hil" => 207,     "igh" => 208,     "int" => 209,     
-            "not" => 210,     "ren" => 211,     " is" => 212,     " pa" => 213,     " sh" => 214,     
-            "ays" => 215,     "com" => 216,     "n s" => 217,     "r a" => 218,     "rin" => 219,     
-            "y a" => 220,     " un" => 221,     "n c" => 222,     "om " => 223,     "thi" => 224,     
-            " mi" => 225,     "by " => 226,     "d i" => 227,     "e d" => 228,     "e n" => 229,     
-            "t o" => 230,     " by" => 231,     "e r" => 232,     "eri" => 233,     "old" => 234,     
-            "ome" => 235,     "whe" => 236,     "yea" => 237,     " gr" => 238,     "ar " => 239,     
-            "ity" => 240,     "mpl" => 241,     "oun" => 242,     "one" => 243,     "ow " => 244,     
-            "r s" => 245,     "s f" => 246,     "tat" => 247,     " ba" => 248,     " vo" => 249,     
-            "bou" => 250,     "sam" => 251,     "tim" => 252,     "vot" => 253,     "abo" => 254,     
-            "ant" => 255,     "ds " => 256,     "ial" => 257,     "ine" => 258,     "man" => 259,     
-            "men" => 260,     " or" => 261,     " po" => 262,     "amp" => 263,     "can" => 264,     
-            "der" => 265,     "e l" => 266,     "les" => 267,     "ny " => 268,     "ot " => 269,     
-            "rec" => 270,     "tes" => 271,     "tho" => 272,     "ica" => 273,     "ild" => 274,     
-            "ir " => 275,     "nde" => 276,     "ose" => 277,     "ous" => 278,     "pre" => 279,     
-            "ste" => 280,     "era" => 281,     "per" => 282,     "r o" => 283,     "red" => 284,     
-            "rie" => 285,     " bo" => 286,     " le" => 287,     "ali" => 288,     "ars" => 289,     
-            "ore" => 290,     "ric" => 291,     "s m" => 292,     "str" => 293,     " fa" => 294,     
+            " th" => 0,     "the" => 1,     "he " => 2,     "ed " => 3,     " to" => 4,
+            " in" => 5,     "er " => 6,     "ing" => 7,     "ng " => 8,     " an" => 9,
+            "nd " => 10,     " of" => 11,     "and" => 12,     "to " => 13,     "of " => 14,
+            " co" => 15,     "at " => 16,     "on " => 17,     "in " => 18,     " a " => 19,
+            "d t" => 20,     " he" => 21,     "e t" => 22,     "ion" => 23,     "es " => 24,
+            " re" => 25,     "re " => 26,     "hat" => 27,     " sa" => 28,     " st" => 29,
+            " ha" => 30,     "her" => 31,     "tha" => 32,     "tio" => 33,     "or " => 34,
+            " ''" => 35,     "en " => 36,     " wh" => 37,     "e s" => 38,     "ent" => 39,
+            "n t" => 40,     "s a" => 41,     "as " => 42,     "for" => 43,     "is " => 44,
+            "t t" => 45,     " be" => 46,     "ld " => 47,     "e a" => 48,     "rs " => 49,
+            " wa" => 50,     "ut " => 51,     "ve " => 52,     "ll " => 53,     "al " => 54,
+            " ma" => 55,     "e i" => 56,     " fo" => 57,     "'s " => 58,     "an " => 59,
+            "est" => 60,     " hi" => 61,     " mo" => 62,     " se" => 63,     " pr" => 64,
+            "s t" => 65,     "ate" => 66,     "st " => 67,     "ter" => 68,     "ere" => 69,
+            "ted" => 70,     "nt " => 71,     "ver" => 72,     "d a" => 73,     " wi" => 74,
+            "se " => 75,     "e c" => 76,     "ect" => 77,     "ns " => 78,     " on" => 79,
+            "ly " => 80,     "tol" => 81,     "ey " => 82,     "r t" => 83,     " ca" => 84,
+            "ati" => 85,     "ts " => 86,     "all" => 87,     " no" => 88,     "his" => 89,
+            "s o" => 90,     "ers" => 91,     "con" => 92,     "e o" => 93,     "ear" => 94,
+            "f t" => 95,     "e w" => 96,     "was" => 97,     "ons" => 98,     "sta" => 99,
+            "'' " => 100,     "sti" => 101,     "n a" => 102,     "sto" => 103,     "t h" => 104,
+            " we" => 105,     "id " => 106,     "th " => 107,     " it" => 108,     "ce " => 109,
+            " di" => 110,     "ave" => 111,     "d h" => 112,     "cou" => 113,     "pro" => 114,
+            "ad " => 115,     "oll" => 116,     "ry " => 117,     "d s" => 118,     "e m" => 119,
+            " so" => 120,     "ill" => 121,     "cti" => 122,     "te " => 123,     "tor" => 124,
+            "eve" => 125,     "g t" => 126,     "it " => 127,     " ch" => 128,     " de" => 129,
+            "hav" => 130,     "oul" => 131,     "ty " => 132,     "uld" => 133,     "use" => 134,
+            " al" => 135,     "are" => 136,     "ch " => 137,     "me " => 138,     "out" => 139,
+            "ove" => 140,     "wit" => 141,     "ys " => 142,     "chi" => 143,     "t a" => 144,
+            "ith" => 145,     "oth" => 146,     " ab" => 147,     " te" => 148,     " wo" => 149,
+            "s s" => 150,     "res" => 151,     "t w" => 152,     "tin" => 153,     "e b" => 154,
+            "e h" => 155,     "nce" => 156,     "t s" => 157,     "y t" => 158,     "e p" => 159,
+            "ele" => 160,     "hin" => 161,     "s i" => 162,     "nte" => 163,     " li" => 164,
+            "le " => 165,     " do" => 166,     "aid" => 167,     "hey" => 168,     "ne " => 169,
+            "s w" => 170,     " as" => 171,     " fr" => 172,     " tr" => 173,     "end" => 174,
+            "sai" => 175,     " el" => 176,     " ne" => 177,     " su" => 178,     "'t " => 179,
+            "ay " => 180,     "hou" => 181,     "ive" => 182,     "lec" => 183,     "n't" => 184,
+            " ye" => 185,     "but" => 186,     "d o" => 187,     "o t" => 188,     "y o" => 189,
+            " ho" => 190,     " me" => 191,     "be " => 192,     "cal" => 193,     "e e" => 194,
+            "had" => 195,     "ple" => 196,     " at" => 197,     " bu" => 198,     " la" => 199,
+            "d b" => 200,     "s h" => 201,     "say" => 202,     "t i" => 203,     " ar" => 204,
+            "e f" => 205,     "ght" => 206,     "hil" => 207,     "igh" => 208,     "int" => 209,
+            "not" => 210,     "ren" => 211,     " is" => 212,     " pa" => 213,     " sh" => 214,
+            "ays" => 215,     "com" => 216,     "n s" => 217,     "r a" => 218,     "rin" => 219,
+            "y a" => 220,     " un" => 221,     "n c" => 222,     "om " => 223,     "thi" => 224,
+            " mi" => 225,     "by " => 226,     "d i" => 227,     "e d" => 228,     "e n" => 229,
+            "t o" => 230,     " by" => 231,     "e r" => 232,     "eri" => 233,     "old" => 234,
+            "ome" => 235,     "whe" => 236,     "yea" => 237,     " gr" => 238,     "ar " => 239,
+            "ity" => 240,     "mpl" => 241,     "oun" => 242,     "one" => 243,     "ow " => 244,
+            "r s" => 245,     "s f" => 246,     "tat" => 247,     " ba" => 248,     " vo" => 249,
+            "bou" => 250,     "sam" => 251,     "tim" => 252,     "vot" => 253,     "abo" => 254,
+            "ant" => 255,     "ds " => 256,     "ial" => 257,     "ine" => 258,     "man" => 259,
+            "men" => 260,     " or" => 261,     " po" => 262,     "amp" => 263,     "can" => 264,
+            "der" => 265,     "e l" => 266,     "les" => 267,     "ny " => 268,     "ot " => 269,
+            "rec" => 270,     "tes" => 271,     "tho" => 272,     "ica" => 273,     "ild" => 274,
+            "ir " => 275,     "nde" => 276,     "ose" => 277,     "ous" => 278,     "pre" => 279,
+            "ste" => 280,     "era" => 281,     "per" => 282,     "r o" => 283,     "red" => 284,
+            "rie" => 285,     " bo" => 286,     " le" => 287,     "ali" => 288,     "ars" => 289,
+            "ore" => 290,     "ric" => 291,     "s m" => 292,     "str" => 293,     " fa" => 294,
             "ess" => 295,     "ie " => 296,     "ist" => 297,     "lat" => 298,     "uri" => 299,
         );
 
@@ -431,10 +431,10 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     {
     // an example that is more than 300 trigrams long
         $str = 'The Italian Renaissance began the opening phase of the Renaissance, a period of great cultural change and achievement from the 14th to the 16th century. The word renaissance means "rebirth," and the era is best known for the renewed interest in the culture of classical antiquity. The Italian Renaissance began in northern Italy, centering in Florence. It then spread south, having an especially significant impact on Rome, which was largely rebuilt by the Renaissance popes. The Italian Renaissance is best known for its cultural achievements. This includes works of literature by such figures as Petrarch, Castiglione, and Machiavelli; artists such as Michaelangelo and Leonardo da Vinci, and great works of architecture such as The Duomo in Florence and St. Peter\'s Basilica in Rome. At the same time, present-day historians also see the era as one of economic regression and of little progress in science. Furthermore, some historians argue that the lot of the peasants and urban poor, the majority of the population, worsened during this period.';
-    
+
         $this->x->setPerlCompatible();
         $tri = $this->xproxy->_trigram($str);
-        
+
         $exp_tri = array(
             ' th',
             'the',
@@ -1112,7 +1112,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
             "n i" => array('change' => 300, 'baserank' => 158, 'refrank' => null),    "he " => array('change' => 0, 'baserank' => 2, 'refrank' => 2),
             " wh" => array('change' => 195, 'baserank' => 232, 'refrank' => 37),      " ph" => array('change' => 300, 'baserank' => 220, 'refrank' => null),
         );
-        
+
         $ranked = $this->xproxy->_arr_rank($this->xproxy->_trigram($str));
         $results = $this->x->detect($str);
 
@@ -1391,7 +1391,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
     function test_count ()
     {
         $langs = $this->x->getLanguages();
-        
+
         $count = $this->x->getLanguageCount();
 
         $this->assertEquals(count($langs), $count);
@@ -1565,7 +1565,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
 
         $this->x->setPerlCompatible(false);
         $result = $this->x->detectConfidence($str);
-    
+
         $this->assertTrue(!is_null($result));
         $this->assertTrue(is_array($result));
         extract($result);
@@ -1576,7 +1576,7 @@ class Text_LanguageDetectTest extends PHPUnit_Framework_TestCase {
         $this->x->setPerlCompatible(true);
         $result = $this->x->detectConfidence($str);
         extract($result, EXTR_OVERWRITE);
-    
+
         $this->assertEquals('english', $language);
 
         // technically the lowest possible score is 0 but it's extremely unlikely to hit that
@@ -1777,7 +1777,7 @@ EOF;
         $chars['Đ'] = 0x0110;
 
         $chars['א'] = 0x05D0;
-        
+
 
         foreach ($chars as $utf8 => $unicode) {
             $this->assertEquals($unicode, $this->xproxy->_utf8char2unicode($utf8), $utf8);
@@ -1800,7 +1800,7 @@ EOF;
         $result2 = $myobj->detectConfidence($str);
 
         $this->assertEquals($result1, $result2);
-        
+
         // note this test doesn't tell if unicode narrowing was actually used or not
     }
 
@@ -1857,7 +1857,7 @@ EOF;
             "croatian" => "biće prilično izjednačena, sugerišu najnovije ankete. Oba kandidata tvrde da su sposobni da dobiju rat protiv terorizma",
 
             "romanian" => "în acest sens aparţinînd Adunării Generale a organizaţiei, în ciuda faptului că mai multe dintre solicitările organizaţiei ivind organizarea scrutinului nu au fost soluţionate",
-            
+
             "turkish" => "yakın tarihin en çekişmeli başkanlık seçiminde oy verme işlemi sürerken, katılımda rekor bekleniyor.",
 
             "kyrgyz" => "көрбөгөндөй элдик толкундоо болуп, Кокон шаарынын көчөлөрүндө бир нече миң киши нааразылык билдирди.",
@@ -1870,7 +1870,7 @@ EOF;
 
 
              "macedonian" => "на јавното мислење покажуваат дека трката е толку тесна, што се очекува двајцата соперници да ја прекршат традицијата и да се појават и на самиот изборен ден.",
-            
+
 
 
              "kazakh" => "Сайлау нәтижесінде дауыстардың басым бөлігін ел премьер министрі Виктор Янукович пен оның қарсыласы, оппозиция жетекшісі Виктор Ющенко алды.",
