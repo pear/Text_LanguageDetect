@@ -6,7 +6,9 @@ php:
   - 7.4
 install:
   - pear install pear/PHP_CodeSniffer
+  - composer install
   - phpenv rehash
 script:
-  - phpunit --coverage-text tests
+  - composer validate
+  - ./vendor/bin/phpunit --coverage-text tests
   - phpcs Text/
