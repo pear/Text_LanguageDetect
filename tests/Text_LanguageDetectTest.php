@@ -42,41 +42,33 @@ class Text_LanguageDetectTest extends \PHPUnit\Framework\TestCase {
         );
     }
 
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Language database does not exist:
-     */
     function test_readdbNonexistingFile()
     {
+        $this->expectException('Text_LanguageDetect_Exception');
+        $this->expectExceptionMessage('Language database does not exist:');
         $this->xproxy->_readdb('thisfiledoesnotexist');
     }
 
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Language database is not readable:
-     */
     function test_readdbUnreadableFile()
     {
+        $this->expectException('Text_LanguageDetect_Exception');
+        $this->expectExceptionMessage('Language database is not readable:');
         $name = tempnam(sys_get_temp_dir(), 'unittest-Text_LanguageDetect-');
         chmod($name, 0000);
         $this->xproxy->_readdb($name);
     }
 
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Language database has no elements.
-     */
     function test_checkTrigramEmpty()
     {
+        $this->expectException('Text_LanguageDetect_Exception');
+        $this->expectExceptionMessage('Language database has no elements.');
         $this->xproxy->_checkTrigram(array());
     }
 
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Language database is not an array
-     */
     function test_checkTrigramNoArray()
     {
+        $this->expectException('Text_LanguageDetect_Exception');
+        $this->expectExceptionMessage('Language database is not an array');
         $this->xproxy->_checkTrigram('foo');
     }
 
@@ -1401,12 +1393,10 @@ class Text_LanguageDetectTest extends \PHPUnit\Framework\TestCase {
         $this->assertFalse($this->x->languageExists(array('en', 'doesnotexist')));
     }
 
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Unsupported parameter type passed to languageExists()
-     */
     function testLanguageExistsUnsupportedType()
     {
+        $this->expectException('Text_LanguageDetect_Exception');
+        $this->expectExceptionMessage('Unsupported parameter type passed to languageExists()');
         $this->x->languageExists(1.23);
     }
 
@@ -1428,7 +1418,7 @@ class Text_LanguageDetectTest extends \PHPUnit\Framework\TestCase {
     function testDetect()
     {
         $scores = $this->x->detect('Das ist ein kleiner Text für euch alle');
-        $this->assertInternalType('array', $scores);
+        $this->assertIsArray($scores);
         $this->assertGreaterThan(5, count($scores));
 
         reset($scores);
@@ -1459,7 +1449,7 @@ class Text_LanguageDetectTest extends \PHPUnit\Framework\TestCase {
     function testDetectSimple()
     {
         $lang = $this->x->detectSimple('Das ist ein kleiner Text für euch alle');
-        $this->assertInternalType('string', $lang);
+        $this->assertIsString($lang);
         $this->assertEquals('german', $lang, 'text is german');
     }
 
@@ -1467,7 +1457,7 @@ class Text_LanguageDetectTest extends \PHPUnit\Framework\TestCase {
     {
         $this->x->setNameMode(2);
         $lang = $this->x->detectSimple('Das ist ein kleiner Text für euch alle');
-        $this->assertInternalType('string', $lang);
+        $this->assertIsString($lang);
         $this->assertEquals('de', $lang, 'text is german');
     }
 
@@ -1687,21 +1677,17 @@ EOF;
         }
     }
 
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Pass a single char only to this method
-     */
     function testUnicodeBlockNameParamString()
     {
+        $this->expectException('Text_LanguageDetect_Exception');
+        $this->expectExceptionMessage('Pass a single char only to this method');
         $this->x->unicodeBlockName('foo bar baz');
     }
 
-    /**
-     * @expectedException Text_LanguageDetect_Exception
-     * @expectedExceptionMessage Input must be of type string or int
-     */
     function testUnicodeBlockNameUnsupportedParamType()
     {
+        $this->expectException('Text_LanguageDetect_Exception');
+        $this->expectExceptionMessage('Input must be of type string or int');
         $this->x->unicodeBlockName(1.23);
     }
 

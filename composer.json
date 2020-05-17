@@ -27,6 +27,6 @@
         "ext-mbstring": "May require the mbstring PHP extension"
     },
     "require-dev": {
-        "phpunit/phpunit": "8.*"
+        "phpunit/phpunit": "8.*|9.*"
     }
 }
