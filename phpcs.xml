@@ -4,5 +4,7 @@
   <!-- we keep the old php4-style variable names for now -->
   <exclude name="PEAR.NamingConventions.ValidFunctionName.PublicUnderscore"/>
   <exclude name="PEAR.NamingConventions.ValidVariableName.PublicUnderscore"/>
+  <!-- we keep the method names for BC reasons -->
+  <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
  </rule>
 </ruleset>
