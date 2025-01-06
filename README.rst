@@ -8,12 +8,6 @@ Returns confidence scores for each.
 Installation
 ============
 
-PEAR
-----
-::
-
-    $ pear install Text_LanguageDetect
-
 Composer
 --------
 ::
