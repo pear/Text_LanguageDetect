@@ -44,7 +44,7 @@ class Text_LanguageDetect_Parser extends Text_LanguageDetect
      *
      * @var string
      */
-    protected $_trigrams = array();
+    protected $_trigram = array();
 
     /**
      * Stores the trigram ranks of the sample
