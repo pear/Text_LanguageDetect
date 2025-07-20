@@ -16,10 +16,9 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <active>no</active>
  </lead>
 
- <date>2017-03-02</date>
- <time>18:00:42</time>
+ <date>2020-05-17</date>
  <version>
-  <release>1.0.0</release>
+  <release>1.0.1</release>
   <api>1.0.0</api>
  </version>
 
@@ -31,10 +30,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
 
  <notes>
-  - Add PHP5 constructors
-  - Fix bug #21189: Language detection on PHP7 broken
-  - Fix coding style problems
-  - BC break: Add real visibility to properties and methods
+  - Support PHP 7.4
  </notes>
 
  <contents>
@@ -104,6 +100,22 @@ http://pear.php.net/dtd/package-2.0.xsd">
  </phprelease>
 
  <changelog>
+
+  <release>
+   <version>
+    <release>1.0.1</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2020-05-17</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+    - Support PHP 7.4
+   </notes>
+  </release>
 
   <release>
    <version>
