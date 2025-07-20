@@ -16,9 +16,9 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <active>no</active>
  </lead>
 
- <date>2020-05-17</date>
+ <date>2023-02-27</date>
  <version>
-  <release>1.0.1</release>
+  <release>1.0.2</release>
   <api>1.0.0</api>
  </version>
 
@@ -30,7 +30,11 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
 
  <notes>
-  - Support PHP 7.4
+Fix PHP 8.2 warning: Creation of dynamic property Text_LanguageDetect…
+
+…_Parser::$_trigram is deprecated
+
+The warning found the bug that the class property had the wrong name.
  </notes>
 
  <contents>
@@ -100,6 +104,26 @@ http://pear.php.net/dtd/package-2.0.xsd">
  </phprelease>
 
  <changelog>
+
+  <release>
+   <version>
+    <release>1.0.2</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2023-02-27</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+Fix PHP 8.2 warning: Creation of dynamic property Text_LanguageDetect…
+
+…_Parser::$_trigram is deprecated
+
+The warning found the bug that the class property had the wrong name.
+   </notes>
+  </release>
 
   <release>
    <version>
