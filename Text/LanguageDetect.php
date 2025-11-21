@@ -1655,7 +1655,7 @@ class Text_LanguageDetect
         }
 
         $newlang = array();
-        foreach ($lang as $key => $val) {            
+        foreach ($lang as $key => $val) {
             if ($convertKey) {
                 $newkey = Text_LanguageDetect_ISO639::$method($key);
                 $newlang[$newkey ?: ''] = $val;
